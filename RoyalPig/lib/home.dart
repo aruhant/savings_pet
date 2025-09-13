@@ -123,7 +123,7 @@ class _HomeState extends State<Home> {
             setState(() {});
           },
         ),
-        MessagePage(),
+        MessagePage(onNewEntry: (e) {}),
 
         /// Messages page
       ][currentPageIndex],

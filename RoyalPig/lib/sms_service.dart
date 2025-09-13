@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:goals/dynamo_service.dart';
+import 'package:goals/log_entry.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:readsms/readsms.dart';
 import 'dart:io' show Platform;
@@ -38,5 +40,35 @@ class SmsService {
   void dispose() {
     _plugin.dispose();
     _smsController.close();
+  }
+}
+
+class SmsMonitor {
+  SmsMonitor({required void Function(Map<String, String>) this.onUpdate});
+  Function(Map<String, String>) onUpdate;
+  final SmsService _smsService = SmsService();
+  StreamSubscription<Map<String, String>>? _subscription;
+
+  void startMonitoring(void Function(Map<String, String>) onSmsReceived) async {
+    bool initialized = await _smsService.initialize();
+    DynamoService dynamoService = DynamoService();
+    if (initialized) {
+      _smsService.smsStream.listen((smsData) async {
+        onSmsReceived(smsData);
+        LogEntry logEntry = LogEntry(
+          text: smsData['body']!,
+          sender: smsData['sender']!,
+          category: "",
+          time: smsData['time']!,
+        );
+        await logEntry.classify();
+        dynamoService.insertNewItem(logEntry.toDBValue(), 'messages');
+      });
+    }
+  }
+
+  void stopMonitoring() {
+    _subscription?.cancel();
+    _smsService.dispose();
   }
 }

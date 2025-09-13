@@ -1,19 +1,15 @@
 // lib/main.dart
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:dart_openai/dart_openai.dart';
 import 'package:goals/goals_page.dart';
 import 'package:goals/secrets.dart';
+import 'package:goals/sms_service.dart';
 import 'package:goals/stats_page.dart';
 import 'package:goals/message_page.dart';
 import 'package:goals/shopping_page.dart';
-
-/// IMPORTANT: This file is a self-contained, minimal implementation of the
-/// app behavior you described. It uses a small in-memory demo data store
-/// (no network). Later you can replace the "DemoData" calls with your
-/// DynamoService / message_page / goal model integrations.
-///
-/// Keep the bottom navbar exactly as requested (flush, no box, center Log bigger).
 
 void main() {
   runApp(const MyApp());
@@ -58,6 +54,11 @@ class _RootScaffoldState extends State<RootScaffold> {
     // Example: load data from DynamoService here (async)
     // DynamoService ds = DynamoService();
     // ds.getAll(tableName: 'messages')...
+    SmsMonitor smsMonitor = SmsMonitor(
+      onUpdate: (smsData) => setState(
+        () => print("New SMS from ${smsData['sender']}: ${smsData['body']}"),
+      ),
+    );
   }
 
   void _onTap(int index) {
