@@ -90,7 +90,7 @@ class _MessagePageState extends State<MessagePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Messages')),
+      appBar: AppBar(title: const Text('Recent Transactions')),
       body: ListView.builder(
         reverse: true,
         itemCount: messages.length,

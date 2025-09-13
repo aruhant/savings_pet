@@ -41,7 +41,6 @@ class _StatsPageState extends State<StatsPage>
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: TabContainer(
-          color: Theme.of(context).colorScheme.secondary,
           tabEdge: TabEdge.left,
           tabsStart: 0.1,
           tabsEnd: 0.6,
@@ -56,13 +55,18 @@ class _StatsPageState extends State<StatsPage>
             color: Colors.black,
             fontSize: 13.0,
           ),
-          children: _getChildren4(),
+          colors: const <Color>[
+            Color(0xff9aebed),
+            Color(0xfffa86be),
+            Color(0xffa275e3),
+          ],
+          children: _getChildren(),
         ),
       ),
     );
   }
 
-  List<Widget> _getChildren4() => <Widget>[
+  List<Widget> _getChildren() => <Widget>[
     SingleChildScrollView(child: LineChartStats()),
     PiChartPage(),
     SingleChildScrollView(
@@ -86,6 +90,10 @@ class _StatsPageState extends State<StatsPage>
   ];
 
   List<Widget> _getTabs4() {
-    return <Widget>[const Text('1'), const Text('2'), const Text('3')];
+    return <Widget>[
+      const Icon(Icons.show_chart),
+      const Icon(Icons.pie_chart),
+      const Icon(Icons.list),
+    ];
   }
 }
