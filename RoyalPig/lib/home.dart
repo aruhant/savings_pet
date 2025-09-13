@@ -118,7 +118,11 @@ class _HomeState extends State<Home> {
         ),
 
         /// Notifications page
-        ShoppingPage(),
+        ShoppingPage(
+          onPurchase: (goalKey, amount) {
+            setState(() {});
+          },
+        ),
         MessagePage(),
 
         /// Messages page
