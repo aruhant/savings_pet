@@ -77,7 +77,7 @@ class Goal {
 }
 
 class GoalsPage extends StatefulWidget {
-  const GoalsPage({Key? key}) : super(key: key);
+  const GoalsPage({Key? key, required Null Function(dynamic goalKey, dynamic amount) onAllocate}) : super(key: key);
 
   @override
   State<GoalsPage> createState() => _GoalsPageState();

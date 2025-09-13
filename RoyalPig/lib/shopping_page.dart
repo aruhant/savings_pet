@@ -107,7 +107,7 @@ class ProductListItem extends StatelessWidget {
 }
 
 class ShoppingPage extends StatefulWidget {
-  const ShoppingPage({super.key});
+  const ShoppingPage({super.key, required Null Function(dynamic goalKey, dynamic amount) onPurchase});
 
   @override
   State<ShoppingPage> createState() => _ShoppingPageState();

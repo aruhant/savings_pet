@@ -2,6 +2,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:goals/goals_page.dart';
+import 'package:goals/shopping_page.dart';
+
 /// IMPORTANT: This file is a self-contained, minimal implementation of the
 /// app behavior you described. It uses a small in-memory demo data store
 /// (no network). Later you can replace the "DemoData" calls with your
@@ -56,8 +59,11 @@ class _RootScaffoldState extends State<RootScaffold> {
 
   void _onTap(int index) {
     setState(() => _selected = index);
-    _pageController.animateToPage(index,
-        duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    _pageController.animateToPage(
+      index,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   @override
@@ -65,27 +71,36 @@ class _RootScaffoldState extends State<RootScaffold> {
     final pages = <Widget>[
       HomePage(userName: _userName),
       AnalyticsPage(),
-      LogPage(onNewEntry: (e) {
-        // new entry saved -> add to demo store then refresh
-        DemoData.addMessage(e);
-        setState(() {});
-      }),
-      GoalsPage(onAllocate: (goalKey, amount) {
-        DemoData.allocateToGoal(goalKey, amount);
-        setState(() {});
-      }),
-      ProfilePage(),
+      LogPage(
+        onNewEntry: (e) {
+          // new entry saved -> add to demo store then refresh
+          DemoData.addMessage(e);
+          setState(() {});
+        },
+      ),
+      ShoppingPage(
+        onPurchase: (goalKey, amount) {
+          DemoData.allocateToGoal(goalKey, amount);
+          setState(() {});
+        },
+      ),
+      GoalsPage(
+        onAllocate: (goalKey, amount) {
+          DemoData.allocateToGoal(goalKey, amount);
+          setState(() {});
+        },
+      ),
     ];
 
     final icons = [
       Icons.home_rounded,
       Icons.pie_chart_outline_rounded,
       Icons.add_circle_outline,
-      Icons.flag_outlined,
-      Icons.person_outline
+      Icons.shopping_cart_outlined,
+      Icons.person_outline,
     ];
 
-    final labels = ['Home', 'Analytics', 'Log', 'Goals', 'Profile'];
+    final labels = ['Home', 'Analytics', 'Log', 'Shop', 'Profile'];
 
     return Scaffold(
       body: PageView(
@@ -104,10 +119,7 @@ class _RootScaffoldState extends State<RootScaffold> {
         items: List.generate(5, (i) {
           final bool isCenter = i == 2;
           return BottomNavigationBarItem(
-            icon: Icon(
-              icons[i],
-              size: isCenter ? 34 : 22,
-            ),
+            icon: Icon(icons[i], size: isCenter ? 34 : 22),
             label: labels[i],
           );
         }),
@@ -142,14 +154,19 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // big HOME style title (minimal)
-            Text('WELCOME,',
-                style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+            Text(
+              'WELCOME,',
+              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+            ),
             const SizedBox(height: 6),
-            Text(widget.userName.toUpperCase(),
-                style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0)),
+            Text(
+              widget.userName.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
+              ),
+            ),
             const SizedBox(height: 18),
 
             // summary card (minimal)
@@ -159,13 +176,18 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Recent spendings',
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.grey[700])),
+                      Text(
+                        'Recent spendings',
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                      ),
                       const SizedBox(height: 6),
-                      Text('\$${totalRecentSpending.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                              fontSize: 22, fontWeight: FontWeight.bold)),
+                      Text(
+                        '\$${totalRecentSpending.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -174,14 +196,16 @@ class _HomePageState extends State<HomePage> {
                     // navigate to messages or sync
                   },
                   icon: const Icon(Icons.sync),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 14),
 
             // Recent list
-            const Text('Recent transactions',
-                style: TextStyle(fontSize: 13, color: Colors.black87)),
+            const Text(
+              'Recent transactions',
+              style: TextStyle(fontSize: 13, color: Colors.black87),
+            ),
             const SizedBox(height: 8),
             Expanded(
               child: ListView.separated(
@@ -247,8 +271,10 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
               alignment: Alignment.topLeft,
               child: Text(
                 'Analytics'.toUpperCase(),
-                style:
-                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 18),
@@ -262,8 +288,8 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       height: 220,
                       width: 220,
                       child: PieChart(
-                          data: _byCategory
-                              .map((k, v) => MapEntry(k, v.abs()))),
+                        data: _byCategory.map((k, v) => MapEntry(k, v.abs())),
+                      ),
                     ),
                     const SizedBox(height: 18),
                     // legend
@@ -273,10 +299,11 @@ class _AnalyticsPageState extends State<AnalyticsPage> {
                       children: List.generate(entries.length, (i) {
                         final e = entries[i];
                         return LegendItem(
-                            color: pieColors[i % pieColors.length],
-                            label: '${e.key} — \$${e.value.toStringAsFixed(2)}');
+                          color: pieColors[i % pieColors.length],
+                          label: '${e.key} — \$${e.value.toStringAsFixed(2)}',
+                        );
                       }),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -330,14 +357,16 @@ class _LogPageState extends State<LogPage> {
         title = 'Log';
     }
     final entry = DemoMessage(
-        title: title,
-        category: category,
-        amount: amount,
-        timestamp: DateTime.now());
+      title: title,
+      category: category,
+      amount: amount,
+      timestamp: DateTime.now(),
+    );
     DemoData.addMessage(entry);
     widget.onNewEntry?.call(entry);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Saved')));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Saved')));
     _controllers.forEach((k, c) => c.clear());
   }
 
@@ -346,13 +375,15 @@ class _LogPageState extends State<LogPage> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(
-            'Log'.toUpperCase(),
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          Form(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Log'.toUpperCase(),
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,11 +397,14 @@ class _LogPageState extends State<LogPage> {
                         value: _type,
                         items: const [
                           DropdownMenuItem(value: 'Car', child: Text('Car')),
-                          DropdownMenuItem(value: 'House', child: Text('House')),
+                          DropdownMenuItem(
+                            value: 'House',
+                            child: Text('House'),
+                          ),
                           DropdownMenuItem(value: 'Trip', child: Text('Trip')),
                         ],
                         onChanged: (v) => setState(() => _type = v ?? 'Car'),
-                      )
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -385,39 +419,49 @@ class _LogPageState extends State<LogPage> {
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _controllers['amount'],
-                      decoration:
-                          const InputDecoration(labelText: 'Amount (total)'),
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: 'Amount (total)',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       validator: (s) =>
                           (s == null || s.isEmpty) ? 'Enter amount' : null,
                     ),
                   ] else if (_type == 'House') ...[
                     TextFormField(
                       controller: _controllers['downPayment'],
-                      decoration:
-                          const InputDecoration(labelText: 'Down payment'),
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
-                      validator: (s) =>
-                          (s == null || s.isEmpty) ? 'Enter down payment' : null,
+                      decoration: const InputDecoration(
+                        labelText: 'Down payment',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: (s) => (s == null || s.isEmpty)
+                          ? 'Enter down payment'
+                          : null,
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _controllers['mortgage'],
-                      decoration:
-                          const InputDecoration(labelText: 'Mortgage (amount)'),
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: 'Mortgage (amount)',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       validator: (s) =>
                           (s == null || s.isEmpty) ? 'Enter mortgage' : null,
                     ),
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _controllers['interest'],
-                      decoration: const InputDecoration(labelText: 'Interest %'),
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: 'Interest %',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       validator: (s) =>
                           (s == null || s.isEmpty) ? 'Enter interest' : null,
                     ),
@@ -431,23 +475,29 @@ class _LogPageState extends State<LogPage> {
                     const SizedBox(height: 8),
                     TextFormField(
                       controller: _controllers['amount'],
-                      decoration:
-                          const InputDecoration(labelText: 'Total needed'),
-                      keyboardType:
-                          const TextInputType.numberWithOptions(decimal: true),
+                      decoration: const InputDecoration(
+                        labelText: 'Total needed',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
                       validator: (s) =>
                           (s == null || s.isEmpty) ? 'Enter total' : null,
                     ),
                   ],
                   const SizedBox(height: 14),
                   ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: kPrimaryBlue),
-                      onPressed: _save,
-                      child: const Text('Save'))
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kPrimaryBlue,
+                    ),
+                    onPressed: _save,
+                    child: const Text('Save'),
+                  ),
                 ],
-              ))
-        ]),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -457,14 +507,14 @@ class _LogPageState extends State<LogPage> {
 /// Goals Page
 /// - shows a list of goals and lets user allocate money to each
 /// -----------------------
-class GoalsPage extends StatefulWidget {
+class GoalsPage1 extends StatefulWidget {
   final void Function(String goalKey, double amount)? onAllocate;
-  const GoalsPage({super.key, this.onAllocate});
+  const GoalsPage1({super.key, this.onAllocate});
   @override
-  State<GoalsPage> createState() => _GoalsPageState();
+  State<GoalsPage1> createState() => _GoalsPage1State();
 }
 
-class _GoalsPageState extends State<GoalsPage> {
+class _GoalsPage1State extends State<GoalsPage1> {
   final TextEditingController _allocController = TextEditingController();
 
   List<DemoGoal> get goals => DemoData.goals;
@@ -472,34 +522,46 @@ class _GoalsPageState extends State<GoalsPage> {
   void _openAllocate(DemoGoal g) {
     _allocController.clear();
     showModalBottomSheet(
-        context: context,
-        builder: (ctx) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(18),
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
-                Text('Allocate to ${g.title}', style: const TextStyle(fontSize: 18)),
+      context: context,
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Allocate to ${g.title}',
+                  style: const TextStyle(fontSize: 18),
+                ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: _allocController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   decoration: const InputDecoration(labelText: 'Amount'),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: kPrimaryBlue),
-                    onPressed: () {
-                      final amt = double.tryParse(_allocController.text) ?? 0.0;
-                      DemoData.allocateToGoal(g.key, amt);
-                      widget.onAllocate?.call(g.key, amt);
-                      Navigator.of(context).pop();
-                      setState(() {});
-                    },
-                    child: const Text('Allocate')),
-              ]),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryBlue,
+                  ),
+                  onPressed: () {
+                    final amt = double.tryParse(_allocController.text) ?? 0.0;
+                    DemoData.allocateToGoal(g.key, amt);
+                    widget.onAllocate?.call(g.key, amt);
+                    Navigator.of(context).pop();
+                    setState(() {});
+                  },
+                  child: const Text('Allocate'),
+                ),
+              ],
             ),
-          );
-        });
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -507,38 +569,62 @@ class _GoalsPageState extends State<GoalsPage> {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Goals'.toUpperCase(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          Expanded(
-            child: goals.isEmpty
-                ? const Center(child: Text('No goals yet'))
-                : ListView.separated(
-                    itemCount: goals.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, i) {
-                      final g = goals[i];
-                      final pct = g.getProgressPercentage();
-                      return Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                          title: Text(g.title),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              LinearProgressIndicator(value: pct/100, color: kPrimaryBlue, backgroundColor: Colors.grey[200]),
-                              const SizedBox(height: 6),
-                              Text('\$${g.currentAmount.toStringAsFixed(2)} / \$${g.targetAmount.toStringAsFixed(2)}')
-                            ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Goals'.toUpperCase(),
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: goals.isEmpty
+                  ? const Center(child: Text('No goals yet'))
+                  : ListView.separated(
+                      itemCount: goals.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, i) {
+                        final g = goals[i];
+                        final pct = g.getProgressPercentage();
+                        return Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          trailing: ElevatedButton(onPressed: () => _openAllocate(g), style: ElevatedButton.styleFrom(backgroundColor: kPrimaryBlue), child: const Text('Add')),
-                        ),
-                      );
-                    }),
-          )
-        ]),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 10,
+                            ),
+                            title: Text(g.title),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LinearProgressIndicator(
+                                  value: pct / 100,
+                                  color: kPrimaryBlue,
+                                  backgroundColor: Colors.grey[200],
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  '\$${g.currentAmount.toStringAsFixed(2)} / \$${g.targetAmount.toStringAsFixed(2)}',
+                                ),
+                              ],
+                            ),
+                            trailing: ElevatedButton(
+                              onPressed: () => _openAllocate(g),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: kPrimaryBlue,
+                              ),
+                              child: const Text('Add'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -560,15 +646,25 @@ class ProfilePage extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Profile'.toUpperCase(), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          ...accounts.map((a) => ListTile(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Profile'.toUpperCase(),
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 12),
+            ...accounts.map(
+              (a) => ListTile(
                 contentPadding: EdgeInsets.zero,
                 title: Text(a['name'] as String),
-                trailing: Text('\$${(a['balance'] as double).toStringAsFixed(2)}'),
-              ))
-        ]),
+                trailing: Text(
+                  '\$${(a['balance'] as double).toStringAsFixed(2)}',
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -584,7 +680,7 @@ class DemoMessage {
   double? amount;
   DateTime timestamp;
   DemoMessage({this.title, this.category, this.amount, DateTime? timestamp})
-      : timestamp = timestamp ?? DateTime.now();
+    : timestamp = timestamp ?? DateTime.now();
 }
 
 class DemoGoal {
@@ -592,7 +688,12 @@ class DemoGoal {
   String title;
   double targetAmount;
   double currentAmount;
-  DemoGoal({required this.key, required this.title, required this.targetAmount, required this.currentAmount});
+  DemoGoal({
+    required this.key,
+    required this.title,
+    required this.targetAmount,
+    required this.currentAmount,
+  });
   double getProgressPercentage() {
     if (targetAmount == 0) return 0.0;
     return ((currentAmount / targetAmount) * 100).clamp(0.0, 100.0);
@@ -601,18 +702,49 @@ class DemoGoal {
 
 class DemoData {
   static final List<DemoMessage> _messages = [
-    DemoMessage(title: 'Groceries', category: 'Food', amount: 24.50, timestamp: DateTime.now().subtract(const Duration(days: 1))),
-    DemoMessage(title: 'Coffee', category: 'Food', amount: 4.75, timestamp: DateTime.now().subtract(const Duration(days: 1))),
-    DemoMessage(title: 'Gas', category: 'Transport', amount: 45.00, timestamp: DateTime.now().subtract(const Duration(days: 2))),
-    DemoMessage(title: 'New phone case', category: 'Shopping', amount: 12.99, timestamp: DateTime.now().subtract(const Duration(days: 3))),
+    DemoMessage(
+      title: 'Groceries',
+      category: 'Food',
+      amount: 24.50,
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    DemoMessage(
+      title: 'Coffee',
+      category: 'Food',
+      amount: 4.75,
+      timestamp: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    DemoMessage(
+      title: 'Gas',
+      category: 'Transport',
+      amount: 45.00,
+      timestamp: DateTime.now().subtract(const Duration(days: 2)),
+    ),
+    DemoMessage(
+      title: 'New phone case',
+      category: 'Shopping',
+      amount: 12.99,
+      timestamp: DateTime.now().subtract(const Duration(days: 3)),
+    ),
   ];
 
   static final List<DemoGoal> _goals = [
-    DemoGoal(key: 'g1', title: 'Vacation', targetAmount: 2000, currentAmount: 400),
-    DemoGoal(key: 'g2', title: 'Down payment', targetAmount: 15000, currentAmount: 3000),
+    DemoGoal(
+      key: 'g1',
+      title: 'Vacation',
+      targetAmount: 2000,
+      currentAmount: 400,
+    ),
+    DemoGoal(
+      key: 'g2',
+      title: 'Down payment',
+      targetAmount: 15000,
+      currentAmount: 3000,
+    ),
   ];
 
-  static List<DemoMessage> recentMessages({int limit = 100}) => _messages.reversed.take(limit).toList();
+  static List<DemoMessage> recentMessages({int limit = 100}) =>
+      _messages.reversed.take(limit).toList();
 
   static void addMessage(DemoMessage m) => _messages.add(m);
 
@@ -621,7 +753,10 @@ class DemoData {
   static List<DemoGoal> get goals => _goals;
 
   static void allocateToGoal(String key, double amount) {
-    final g = _goals.firstWhere((x) => x.key == key, orElse: () => throw Exception('Goal not found'));
+    final g = _goals.firstWhere(
+      (x) => x.key == key,
+      orElse: () => throw Exception('Goal not found'),
+    );
     g.currentAmount += amount;
   }
 }
@@ -635,7 +770,7 @@ final List<Color> pieColors = [
   Colors.orange,
   Colors.purple,
   Colors.teal,
-  Colors.red
+  Colors.red,
 ];
 
 class PieChart extends StatelessWidget {
@@ -677,7 +812,13 @@ class _PiePainter extends CustomPainter {
     for (final entry in data.entries) {
       final sweep = (entry.value / total) * 2 * pi;
       paint.color = colors[i % colors.length];
-      canvas.drawArc(Rect.fromCircle(center: center, radius: radius), startRads, sweep, true, paint);
+      canvas.drawArc(
+        Rect.fromCircle(center: center, radius: radius),
+        startRads,
+        sweep,
+        true,
+        paint,
+      );
       startRads += sweep;
       i++;
     }
@@ -696,10 +837,13 @@ class LegendItem extends StatelessWidget {
   const LegendItem({super.key, required this.color, required this.label});
   @override
   Widget build(BuildContext context) {
-    return Row(mainAxisSize: MainAxisSize.min, children: [
-      Container(width: 12, height: 12, color: color),
-      const SizedBox(width: 6),
-      Text(label)
-    ]);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(width: 12, height: 12, color: color),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
   }
 }

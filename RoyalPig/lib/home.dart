@@ -111,7 +111,11 @@ class _HomeState extends State<Home> {
       body: <Widget>[
         /// Home page
         StatsPage(),
-        GoalsPage(),
+        GoalsPage(
+          onAllocate: (goalKey, amount) {
+            setState(() {});
+          },
+        ),
 
         /// Notifications page
         ShoppingPage(),
