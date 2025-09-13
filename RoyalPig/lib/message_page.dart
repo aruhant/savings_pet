@@ -95,23 +95,7 @@ class _MessagePageState extends State<MessagePage> {
         reverse: true,
         itemCount: messages.length,
         itemBuilder: (BuildContext context, int index) {
-          return Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              margin: const EdgeInsets.all(8.0),
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Text(
-                '${messages[index].text} - ${messages[index].sender} at ${messages[index].time}',
-                style: theme.textTheme.bodyLarge!.copyWith(
-                  color: theme.colorScheme.onPrimary,
-                ),
-              ),
-            ),
-          );
+          return LogEntryWidget(logEntry: messages[index]);
         },
       ),
       floatingActionButton: FloatingActionButton(
