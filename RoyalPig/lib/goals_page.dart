@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:aws_dynamodbstreams_api/streams-dynamodb-2012-08-10.dart'
     as aws;
 import 'dynamo_service.dart';
-import 'message.dart';
+import 'log_entry.dart';
 import 'dynamo_stream_listener.dart';
 import 'sms_service.dart';
 

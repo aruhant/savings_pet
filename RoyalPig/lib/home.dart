@@ -6,7 +6,7 @@ import 'package:goals/goals_page.dart';
 import 'message_page.dart';
 import 'stats_page.dart';
 import 'dynamo_service.dart';
-import 'message.dart';
+import 'log_entry.dart';
 import 'shopping_page.dart';
 import 'sms_service.dart';
 import 'user.dart';
@@ -40,7 +40,7 @@ class _HomeState extends State<Home> {
       if (initialized) {
         _smsSubscription = smsService.smsStream.listen((smsData) {
           dynamoService.insertNewItem(
-            Message(
+            LogEntry(
               text: smsData['body']!,
               sender: smsData['sender']!,
               category: "uncategorized",

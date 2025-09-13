@@ -39,6 +39,7 @@ dependencies:
   flutter_svg:
   auth0_flutter:
   tab_container:
+  dart_openai:
   readsms:
     git:
       url: https://github.com/Ali3Jamous/readsms_plugin/

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:goals/line_chart_page.dart';
 import 'package:goals/pie_chart_page.dart';
-import 'stats.dart';
-import 'dynamo_stream_listener.dart';
-import 'chart.dart';
 import 'package:tab_container/tab_container.dart';
 
 class StatsPage extends StatefulWidget {
@@ -44,10 +41,11 @@ class _StatsPageState extends State<StatsPage>
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: TabContainer(
-          color: Theme.of(context).colorScheme.primary,
+          color: Theme.of(context).colorScheme.secondary,
           tabEdge: TabEdge.left,
           tabsStart: 0.1,
           tabsEnd: 0.6,
+          borderRadius: BorderRadius.circular(20),
           childPadding: const EdgeInsets.all(20.0),
           tabs: _getTabs4(),
           selectedTextStyle: const TextStyle(
@@ -91,116 +89,3 @@ class _StatsPageState extends State<StatsPage>
     return <Widget>[const Text('1'), const Text('2'), const Text('3')];
   }
 }
-
-class CreditCard extends StatelessWidget {
-  final Color? color;
-  final CreditCardData data;
-
-  const CreditCard({super.key, this.color, required this.data});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(14.0),
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [Text(data.bank), const Icon(Icons.person, size: 36)],
-            ),
-          ),
-          const Spacer(flex: 2),
-          Expanded(
-            flex: 5,
-            child: Row(
-              children: [
-                Text(data.number, style: const TextStyle(fontSize: 22.0)),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Exp.'),
-                const SizedBox(width: 4),
-                Text(data.expiration),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                Text(data.name, style: const TextStyle(fontSize: 16.0)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CreditCardData {
-  int index;
-  bool locked;
-  final String bank;
-  final String name;
-  final String number;
-  final String expiration;
-  final String cvc;
-
-  CreditCardData({
-    this.index = 0,
-    this.locked = false,
-    required this.bank,
-    required this.name,
-    required this.number,
-    required this.expiration,
-    required this.cvc,
-  });
-
-  factory CreditCardData.fromJson(Map<String, dynamic> json) => CreditCardData(
-    index: json['index'],
-    bank: json['bank'],
-    name: json['name'],
-    number: json['number'],
-    expiration: json['expiration'],
-    cvc: json['cvc'],
-  );
-}
-
-const List<Map<String, dynamic>> kCreditCards = [
-  {
-    'index': 0,
-    'bank': 'Aerarium',
-    'name': 'John Doe',
-    'number': '5234 4321 1234 4321',
-    'expiration': '11/25',
-    'cvc': '123',
-  },
-  {
-    'index': 1,
-    'bank': 'Aerarium',
-    'name': 'John Doe',
-    'number': '4234 4321 1234 4321',
-    'expiration': '07/24',
-    'cvc': '321',
-  },
-  {
-    'index': 2,
-    'bank': 'Aerarium',
-    'name': 'John Doe',
-    'number': '5234 4321 1234 4321',
-    'expiration': '09/23',
-    'cvc': '456',
-  },
-];

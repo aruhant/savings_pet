@@ -1,8 +1,9 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
 import 'dart:math';
-
+import 'package:dart_openai/dart_openai.dart';
 import 'package:goals/goals_page.dart';
+import 'package:goals/secrets.dart';
 import 'package:goals/stats_page.dart';
 import 'package:goals/message_page.dart';
 import 'package:goals/shopping_page.dart';
@@ -232,7 +233,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 
 /// -----------------------
 /// Log Page

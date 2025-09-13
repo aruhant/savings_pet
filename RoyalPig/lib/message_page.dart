@@ -3,12 +3,13 @@ import 'dart:async';
 import 'package:aws_dynamodbstreams_api/streams-dynamodb-2012-08-10.dart'
     as aws;
 import 'dynamo_service.dart';
-import 'message.dart';
+import 'log_entry.dart';
 import 'dynamo_stream_listener.dart';
 import 'sms_service.dart';
 
 class MessagePage extends StatefulWidget {
-  const MessagePage({Key? key, required Null Function(dynamic e) onNewEntry}) : super(key: key);
+  const MessagePage({Key? key, required Null Function(dynamic e) onNewEntry})
+    : super(key: key);
 
   @override
   State<MessagePage> createState() => _MessagePageState();
@@ -23,15 +24,15 @@ class _MessagePageState extends State<MessagePage> {
   String sender = 'no sms received';
   String time = 'no sms received';
   StreamSubscription<Map<String, String>>? _smsSubscription; // Add this
-  List<Message> messages = [];
+  List<LogEntry> messages = [];
 
   @override
   void initState() {
     super.initState();
 
-    final listener = DynamoStreamListener<Message>(
+    final listener = DynamoStreamListener<LogEntry>(
       tableName: "messages",
-      fromJson: (json) => Message.fromJson(json),
+      fromJson: (json) => LogEntry.fromJson(json),
     );
 
     listener.currentItems.then((items) {
@@ -65,7 +66,7 @@ class _MessagePageState extends State<MessagePage> {
             sms = smsData['body']!;
             sender = smsData['sender']!;
             time = smsData['time']!;
-            Message message = Message(
+            LogEntry message = LogEntry(
               text: sms,
               sender: sender,
               category: "inbox",
@@ -114,13 +115,15 @@ class _MessagePageState extends State<MessagePage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Message message = Message(
-            text: "test message",
+        onPressed: () async {
+          LogEntry message = LogEntry(
+            text:
+                "You spent \$${(20 + (80 * (new DateTime.now().second % 10) / 10)).toStringAsFixed(2)} at ${["Starbucks", "McDonalds", "Amazon", "Walmart", "Target"][new DateTime.now().second % 5]}",
             sender: "test sender",
-            category: "test category",
+            category: "",
             time: DateTime.now().toString(),
           );
+          await message.classify();
           dynamoService.insertNewItem(message.toDBValue(), tableName);
         },
         child: const Icon(Icons.add),
