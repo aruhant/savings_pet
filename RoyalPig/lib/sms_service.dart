@@ -44,8 +44,7 @@ class SmsService {
 }
 
 class SmsMonitor {
-  SmsMonitor({required void Function(Map<String, String>) this.onUpdate});
-  Function(Map<String, String>) onUpdate;
+  SmsMonitor();
   final SmsService _smsService = SmsService();
   StreamSubscription<Map<String, String>>? _subscription;
 
@@ -54,6 +53,7 @@ class SmsMonitor {
     DynamoService dynamoService = DynamoService();
     if (initialized) {
       _smsService.smsStream.listen((smsData) async {
+        print("New SMS from ${smsData['sender']}: ${smsData['body']}");
         onSmsReceived(smsData);
         LogEntry logEntry = LogEntry(
           text: smsData['body']!,

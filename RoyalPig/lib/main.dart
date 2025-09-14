@@ -54,11 +54,12 @@ class _RootScaffoldState extends State<RootScaffold> {
     // Example: load data from DynamoService here (async)
     // DynamoService ds = DynamoService();
     // ds.getAll(tableName: 'messages')...
-    SmsMonitor smsMonitor = SmsMonitor(
-      onUpdate: (smsData) => setState(
-        () => print("New SMS from ${smsData['sender']}: ${smsData['body']}"),
-      ),
-    );
+    SmsMonitor smsMonitor = SmsMonitor();
+    smsMonitor.startMonitoring((smsData) {
+      () => setState(() {
+        print("New SMS from ${smsData['sender']}: ${smsData['body']}");
+      });
+    });
   }
 
   void _onTap(int index) {

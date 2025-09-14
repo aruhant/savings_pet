@@ -19,12 +19,7 @@ class _MessagePageState extends State<MessagePage> {
   final String tableName = "messages";
   final DynamoService dynamoService = DynamoService();
   final service = aws.DynamoDBStreams(region: 'eu-east-12');
-  final SmsService smsService = SmsService(); // Add this
-  String sms = 'no sms received';
-  String sender = 'no sms received';
-  String time = 'no sms received';
-  StreamSubscription<Map<String, String>>? _smsSubscription; // Add this
-  List<LogEntry> messages = [];
+   List<LogEntry> messages = [];
 
   @override
   void initState() {
@@ -57,33 +52,12 @@ class _MessagePageState extends State<MessagePage> {
         }
       },
     );
-
-    // Initialize SMS service and listen to its stream
-    smsService.initialize().then((initialized) {
-      if (initialized) {
-        _smsSubscription = smsService.smsStream.listen((smsData) {
-          setState(() {
-            sms = smsData['body']!;
-            sender = smsData['sender']!;
-            time = smsData['time']!;
-            LogEntry message = LogEntry(
-              text: sms,
-              sender: sender,
-              category: "inbox",
-              time: time,
-            );
-            dynamoService.insertNewItem(message.toDBValue(), tableName);
-          });
-        });
-      }
-    });
+ 
   }
 
   @override
   void dispose() {
     super.dispose();
-    _smsSubscription?.cancel(); // Cancel subscription
-    smsService.dispose(); // Dispose service
   }
 
   @override
