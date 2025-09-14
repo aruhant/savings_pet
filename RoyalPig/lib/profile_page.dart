@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:goals/rbc_investease_api_client.dart';
 import 'package:goals/user.dart';
+<<<<<<< HEAD
+
+=======
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -13,15 +17,29 @@ class _ProfilePageState extends State<ProfilePage> {
   // Profile info
   String _name = AuthService.currentClient?.name ?? "John Doe";
   String _email = AuthService.currentClient?.email ?? "johndoe@email.com";
+<<<<<<< HEAD
+
+=======
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
 
   // Goal info
   String _goalName = "Trip to Europe";
   double _goalCost = 3000;
   double _goalSaved = 1200;
+  String _goalEndDate = "Dec 2025";
+  String _goalDescription = "Save for a trip to Europe with friends";
+
+
+<<<<<<< HEAD
 
   @override
   Widget build(BuildContext context) {
+        Client client = AuthService.currentClient!;
+=======
+  @override
+  Widget build(BuildContext context) {
     Client client = AuthService.currentClient!;
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
     final accounts = [
       {'name': 'Cash', 'balance': client.cash},
       ...client.portfolios.map(
@@ -30,17 +48,56 @@ class _ProfilePageState extends State<ProfilePage> {
           'balance': portfolio.currentValue,
         },
       ),
+<<<<<<< HEAD
+
     ];
+
+=======
+    ];
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+<<<<<<< HEAD
+            // Page Title with Log Out button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                /*
+                Text(
+                  "PROFILE",
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                */
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.purple.shade200, width: 1),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout, size: 20),
+                    onPressed: () {},
+                    tooltip: 'Log Out',
+                    color: const Color.fromARGB(255, 40, 39, 41),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ),
+              ],
+=======
             // Page Title
             Text(
               "PROFILE",
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
             ),
             const SizedBox(height: 20),
 
@@ -50,11 +107,24 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   const CircleAvatar(
                     radius: 40,
+                    backgroundImage: AssetImage('assets/profile.png'),
                     backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                   const SizedBox(height: 12),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _name,
+                        style: const TextStyle(
+                                                  fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(_email, style: const TextStyle(color: Colors.black54)),
                   Text(
+<<<<<<< HEAD
+=======
                     _name,
                     style: const TextStyle(
                       fontSize: 20,
@@ -63,6 +133,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   Text(_email, style: const TextStyle(color: Colors.black54)),
                   Text(
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
                     "Joined " +
                         (AuthService.currentClient?.createdAt != null
                             ? DateTime.tryParse(
@@ -73,13 +144,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                   : AuthService.currentClient!.createdAt
                             : "Jan 2023"),
                     style: const TextStyle(color: Colors.black38, fontSize: 12),
+<<<<<<< HEAD
+),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.edit, size: 20),
+                    onPressed: () => _showEditProfileDialog(context),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+=======
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-
-            // Accounts card
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -124,13 +205,14 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Separate Action Buttons
             _actionButton(
-              icon: Icons.edit,
-              text: "Edit Profile",
-              onTap: () => _showEditProfileDialog(context),
-            ),
-            const SizedBox(height: 12),
-            _actionButton(
               icon: Icons.flag,
+<<<<<<< HEAD
+              text: "Goal: Europe Trip",
+              subtitle: "$_goalEndDate\nSaved: \$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)}",
+              onTap: () => _showEditGoalDialog(context),
+              
+              
+=======
               text: "Edit Goal",
               subtitle:
                   "$_goalName (\$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)})",
@@ -144,6 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
               text: "Log Out",
               color: Colors.red,
               onTap: () {},
+>>>>>>> e50668e505ca2a8a55ba32f9aa0865d27253f692
             ),
           ],
         ),
@@ -198,6 +281,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final nameController = TextEditingController(text: _goalName);
     final costController = TextEditingController(text: _goalCost.toString());
     final savedController = TextEditingController(text: _goalSaved.toString());
+    final endDateController = TextEditingController(text: _goalEndDate);
+    final descriptionController = TextEditingController(text: _goalDescription);
 
     showDialog(
       context: context,
@@ -209,6 +294,15 @@ class _ProfilePageState extends State<ProfilePage> {
             TextField(
               controller: nameController,
               decoration: const InputDecoration(labelText: "Goal Name"),
+            ),
+            // short description of goal
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: "Description"),
+            ),
+            TextField(
+              controller: endDateController,
+              decoration: const InputDecoration(labelText: "End Date"),
             ),
             TextField(
               controller: costController,
@@ -231,6 +325,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               setState(() {
                 _goalName = nameController.text;
+                _goalEndDate = endDateController.text;
                 _goalCost = double.tryParse(costController.text) ?? _goalCost;
                 _goalSaved =
                     double.tryParse(savedController.text) ?? _goalSaved;
@@ -288,7 +383,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.black54),
+            const Icon(Icons.edit, color: Colors.black54, size: 18),
           ],
         ),
       ),
