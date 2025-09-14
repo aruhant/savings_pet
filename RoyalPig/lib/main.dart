@@ -2,8 +2,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:goals/dynamo_service.dart';
 import 'dart:math';
 import 'package:goals/home_page.dart';
+import 'package:goals/log_entry.dart';
 import 'package:goals/rbc_investease_api_client.dart';
 import 'package:goals/shopping_items.dart';
 import 'package:goals/sms_service.dart';
@@ -112,6 +114,23 @@ class _RootScaffoldState extends State<RootScaffold> {
                         (goalKey as ShoppingItem).portfolio,
                         amount,
                       );
+
+                      DynamoService().insertNewItem(
+                        LogEntry(
+                          text:
+                              "Invested \$${amount.toStringAsFixed(2)} in the ${goalKey.portfolio} portfolio",
+                          sender: "system",
+                          category: "investment",
+                          time: DateTime.now().toString(),
+                          amount: amount,
+                          merchant:
+                              '${goalKey.title} (${goalKey.portfolio.toTitleCase()})',
+                          recepient: "RBC InvestEase",
+                          type: 'credit',
+                        ).toDBValue(),
+                        'messages',
+                      );
+
                       Navigator.of(context).pop(true);
                     },
                     child: const Text('Confirm'),
