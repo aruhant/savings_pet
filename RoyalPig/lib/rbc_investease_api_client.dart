@@ -96,7 +96,7 @@ class Client {
     portfolios: (json['portfolios'] as List)
         .map((e) => Portfolio.fromJson(e))
         .toList(),
-    cash: json['cash'],
+    cash: (json['cash'] as num).toDouble(),
     createdAt: json['created_at'],
     updatedAt: json['updated_at'],
   );
@@ -291,6 +291,8 @@ class ErrorResponse {
   final String? code;
 
   ErrorResponse({required this.message, this.error, this.code});
+  String toString() =>
+      'ErrorResponse(message: $message, error: $error, code: $code)';
 
   factory ErrorResponse.fromJson(Map<String, dynamic> json) => ErrorResponse(
     message: json['message'],
@@ -510,6 +512,17 @@ class ApiClient {
       return jsonDecode(response.body);
     } else {
       throw ErrorResponse.fromJson(jsonDecode(response.body));
+    }
+  }
+
+  Future<Client?> getClientByEmail(String email) async {
+    List<Client> all = await getClients();
+    print('Searching for client with email: $email');
+    try {
+      return all.firstWhere((client) => client.email == email);
+    } catch (e) {
+      print('No client found with email $email: $e');
+      return null;
     }
   }
 }

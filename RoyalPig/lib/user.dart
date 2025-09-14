@@ -1,4 +1,5 @@
 import 'package:auth0_flutter/auth0_flutter.dart';
+import 'package:goals/goals_page.dart';
 import 'package:goals/secrets.dart';
 
 class User {
@@ -37,11 +38,17 @@ class AuthService {
     try {
       final credentials = await auth0.credentialsManager.credentials();
       _currentUser = User.fromCredentials(credentials);
+      print(
+        'login: Fetched user from credentials manager: ${_currentUser!.email}',
+      );
+      await fetchUserProfile(_currentUser!);
       return _currentUser;
     } catch (e) {
       try {
+        print('login:No valid credentials, starting web authentication: $e');
         final credentials = await auth0.webAuthentication().login();
         _currentUser = User.fromCredentials(credentials);
+        await fetchUserProfile(_currentUser!);
         return _currentUser;
       } catch (e) {
         print('Login failed: $e');
@@ -55,5 +62,9 @@ class AuthService {
       Auth0Secrets['domain']!,
       Auth0Secrets['clientId']!,
     ).webAuthentication().logout();
+  }
+
+  static Future<void> fetchUserProfile(User user) async {
+    await Goal.userGoal(user);
   }
 }

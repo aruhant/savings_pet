@@ -19,7 +19,7 @@ class _MessagePageState extends State<MessagePage> {
   final String tableName = "messages";
   final DynamoService dynamoService = DynamoService();
   final service = aws.DynamoDBStreams(region: 'eu-east-12');
-   List<LogEntry> messages = [];
+  List<LogEntry> messages = [];
 
   @override
   void initState() {
@@ -31,9 +31,10 @@ class _MessagePageState extends State<MessagePage> {
     );
 
     listener.currentItems.then((items) {
-      setState(() {
-        messages = items;
-      });
+      if (mounted)
+        setState(() {
+          messages = items;
+        });
     });
 
     listener.listen(
@@ -52,7 +53,6 @@ class _MessagePageState extends State<MessagePage> {
         }
       },
     );
- 
   }
 
   @override
@@ -62,7 +62,6 @@ class _MessagePageState extends State<MessagePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Recent Transactions')),
       body: ListView.builder(

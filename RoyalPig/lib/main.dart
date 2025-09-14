@@ -10,6 +10,7 @@ import 'package:goals/sms_service.dart';
 import 'package:goals/stats_page.dart';
 import 'package:goals/message_page.dart';
 import 'package:goals/shopping_page.dart';
+import 'package:goals/user.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,6 +55,13 @@ class _RootScaffoldState extends State<RootScaffold> {
     // Example: load data from DynamoService here (async)
     // DynamoService ds = DynamoService();
     // ds.getAll(tableName: 'messages')...
+    AuthService.login().then((user) {
+      if (user != null) {
+        print('Logged in as ${user.name} (${user.email} - ${user.id})');
+      } else {
+        print('Login failed or cancelled');
+      }
+    });
     SmsMonitor smsMonitor = SmsMonitor();
     smsMonitor.startMonitoring((smsData) {
       () => setState(() {

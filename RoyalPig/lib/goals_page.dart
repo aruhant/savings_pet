@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:aws_dynamodbstreams_api/streams-dynamodb-2012-08-10.dart'
     as aws;
+import 'package:goals/rbc_investease_api_client.dart';
+import 'package:goals/user.dart';
 import 'dynamo_service.dart';
 import 'log_entry.dart';
 import 'dynamo_stream_listener.dart';
@@ -15,6 +17,8 @@ class Goal {
   DateTime targetDate;
   double progress = 0.0;
   double totalAmount = 0.0;
+  String investmentID;
+  double investedAmount = 0.0;
 
   Goal({
     required this.title,
@@ -23,6 +27,8 @@ class Goal {
     required this.imageUrl,
     this.progress = 0.0,
     this.totalAmount = 0.0,
+    this.investmentID = '',
+    this.investedAmount = 0.0,
   });
 
   // factory constructor to create Goal from DynamoDB item
@@ -34,6 +40,8 @@ class Goal {
       progress: double.parse(dbValue["progress"]!.n ?? '0'),
       totalAmount: double.parse(dbValue["totalAmount"]!.n ?? '0'),
       imageUrl: dbValue["imageUrl"]!.s!,
+      investmentID: dbValue["investmentID"]?.s ?? '',
+      investedAmount: double.parse(dbValue["investedAmount"]?.n ?? '0'),
     );
   }
 
@@ -45,6 +53,8 @@ class Goal {
     dbMap["progress"] = AttributeValue(n: progress.toString());
     dbMap["totalAmount"] = AttributeValue(n: totalAmount.toString());
     dbMap["imageUrl"] = AttributeValue(s: imageUrl);
+    dbMap["investmentID"] = AttributeValue(s: investmentID);
+    dbMap["investedAmount"] = AttributeValue(n: investedAmount.toString());
     return dbMap;
   }
 
@@ -60,46 +70,97 @@ class Goal {
     await DynamoService().insertNewItem(toDBValue(), "goals");
   }
 
-  static Future<Goal> currentUserGoal() async {
+  static Goal? _goal;
+  static Goal? get currentUserGoal => _goal;
+  static Future<Goal> userGoal(User currentUser) async {
+    if (_goal != null) return _goal!;
+    print('Fetching goal for user: ${currentUser.email}');
     final response = await DynamoService().getItem<Goal>(
       tableName: "goals",
       fromJson: (json) => Goal.fromJson(json),
     );
 
-    return response ??
+    print('Fetched goal: $response');
+
+    if (response != null) {
+      return _goal = response;
+    }
+    print('No goal found, checking investment account');
+    Client? client;
+    try {
+      client = await ApiClient().getClientByEmail(currentUser.email);
+    } catch (e) {
+      print('Error fetching client by email: $e');
+    }
+
+    print('Fetched investment account: $client');
+    if (client == null) {
+      try {
+        client = await ApiClient().createClient(
+          ClientCreate(
+            name: currentUser.name,
+            email: currentUser.email,
+            cash: 1000.0,
+            portfolios: ['balanced'],
+          ),
+        );
+      } catch (e) {
+        print('Error creating investment account: ${e}');
+        return Goal(
+          title: 'No Goal',
+          description: 'Set a new goal',
+          targetDate: DateTime.now(),
+          investmentID: '',
+          imageUrl: '',
+        );
+      }
+    }
+
+    print('Created investment account: ${client.id}');
+
+    _goal =
+        response ??
         Goal(
           title: 'No Goal',
           description: 'Set a new goal',
           targetDate: DateTime.now(),
+          investmentID: client.id,
           imageUrl: '',
         );
+
+    await _goal!.save();
+    return _goal!;
   }
 }
 
 class GoalsPage extends StatefulWidget {
-  const GoalsPage({Key? key, required Null Function(dynamic goalKey, dynamic amount) onAllocate}) : super(key: key);
+  const GoalsPage({
+    Key? key,
+    required Null Function(dynamic goalKey, dynamic amount) onAllocate,
+  }) : super(key: key);
 
   @override
   State<GoalsPage> createState() => _GoalsPageState();
 }
 
 class _GoalsPageState extends State<GoalsPage> {
-  late Future<Goal> _goalFuture;
-
   @override
   void initState() {
     super.initState();
-    _goalFuture = Goal.currentUserGoal();
   }
 
   void _refreshGoal() {
-    setState(() {
-      _goalFuture = Goal.currentUserGoal();
-    });
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    Goal goal = Goal.currentUserGoal!;
+
+    final daysToGo = goal.targetDate.difference(DateTime.now()).inDays;
+    final completionPercentage = goal.totalAmount > 0
+        ? (goal.progress / goal.totalAmount)
+        : 0.0;
     return Scaffold(
       appBar: AppBar(title: const Text('Goals')),
       floatingActionButton: FloatingActionButton(
@@ -111,59 +172,30 @@ class _GoalsPageState extends State<GoalsPage> {
         },
         child: const Icon(Icons.edit),
       ),
-      body: FutureBuilder<Goal>(
-        future: _goalFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            return const Center(child: Text('No goal found.'));
-          } else {
-            final goal = snapshot.data!;
-            final daysToGo = goal.targetDate.difference(DateTime.now()).inDays;
-            final completionPercentage = goal.totalAmount > 0
-                ? (goal.progress / goal.totalAmount)
-                : 0.0;
-
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    goal.title,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  if (goal.imageUrl.isNotEmpty)
-                    Image.network(
-                      goal.imageUrl,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                  const SizedBox(height: 16),
-                  Text(goal.description, style: const TextStyle(fontSize: 16)),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Completion: ${(completionPercentage * 100).toStringAsFixed(1)}%',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                  LinearProgressIndicator(value: completionPercentage),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Days to go: $daysToGo',
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            );
-          }
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              goal.title,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            if (goal.imageUrl.isNotEmpty)
+              Image.network(goal.imageUrl, height: 200, fit: BoxFit.cover),
+            const SizedBox(height: 16),
+            Text(goal.description, style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 16),
+            Text(
+              'Completion: ${(completionPercentage * 100).toStringAsFixed(1)}%',
+              style: const TextStyle(fontSize: 18),
+            ),
+            LinearProgressIndicator(value: completionPercentage),
+            const SizedBox(height: 16),
+            Text('Days to go: $daysToGo', style: const TextStyle(fontSize: 18)),
+          ],
+        ),
       ),
     );
   }
@@ -185,6 +217,8 @@ class _GoalEditorState extends State<GoalEditor> {
   String _imageUrl = '';
   DateTime _targetDate = DateTime.now().add(const Duration(days: 30));
   double _totalAmount = 0.0;
+  String _investmentID = '';
+  double _investedAmount = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -235,6 +269,29 @@ class _GoalEditorState extends State<GoalEditor> {
                 },
                 onSaved: (value) => _totalAmount = double.parse(value!),
               ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Investment ID'),
+                onSaved: (value) => _investmentID = value ?? '',
+              ),
+              TextFormField(
+                decoration: const InputDecoration(labelText: 'Invested Amount'),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                validator: (value) {
+                  if (value != null && value.isNotEmpty) {
+                    final n = num.tryParse(value);
+                    if (n == null || n < 0) {
+                      return 'Enter a valid non-negative number';
+                    }
+                  }
+                  return null;
+                },
+                onSaved: (value) =>
+                    _investedAmount = value != null && value.isNotEmpty
+                    ? double.parse(value)
+                    : 0.0,
+              ),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -278,6 +335,8 @@ class _GoalEditorState extends State<GoalEditor> {
                 targetDate: _targetDate,
                 totalAmount: _totalAmount,
                 progress: 0.0,
+                investmentID: _investmentID,
+                investedAmount: _investedAmount,
               );
               newGoal.save().then((_) {
                 Navigator.of(context).pop();
