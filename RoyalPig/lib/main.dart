@@ -10,7 +10,9 @@ import 'package:goals/sms_service.dart';
 import 'package:goals/stats_page.dart';
 import 'package:goals/message_page.dart';
 import 'package:goals/shopping_page.dart';
+import 'package:goals/temp_main.dart';
 import 'package:goals/user.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -95,13 +97,14 @@ class _RootScaffoldState extends State<RootScaffold> {
           DemoData.allocateToGoal(goalKey, amount);
           setState(() {});
         },
-      ),
+      ),/*
       GoalsPage(
         onAllocate: (goalKey, amount) {
           DemoData.allocateToGoal(goalKey, amount);
           setState(() {});
         },
       ),
+      */      ProfilePage(),
     ];
 
     final icons = [
@@ -146,96 +149,205 @@ class _RootScaffoldState extends State<RootScaffold> {
 class HomePage extends StatefulWidget {
   final String userName;
   const HomePage({super.key, required this.userName});
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  // In a real app, load messages from DynamoService or your message_page
-  List<DemoMessage> get recentMessages => DemoData.recentMessages(limit: 5);
+  // Dummy values (replace with DynamoDB data later)
+  double totalBalance = 2059.28;
+  double monthSpending = -353.48;
+  double goalCurrent = 798;
+  double goalTarget = 3000;
 
-  double get totalRecentSpending =>
-      recentMessages.fold(0.0, (s, m) => s + (m.amount ?? 0.0));
+  List<Map<String, dynamic>> recentTransactions = [
+    {"title": "Star Café", "category": "Shopping", "amount": 87.66},
+    {"title": "Fuel Station", "category": "Shopping", "amount": 101.05},
+    {"title": "Bakery", "category": "Transport", "amount": 63.31},
+  ];
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // big HOME style title (minimal)
+            // Welcome text
             Text(
-              'WELCOME,',
-              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              widget.userName.toUpperCase(),
+              "Welcome back, ${widget.userName} 👋",
               style: const TextStyle(
-                fontSize: 32,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 1.0,
               ),
             ),
             const SizedBox(height: 18),
 
-            // summary card (minimal)
+            // Total balance card
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.shade200,
+                      blurRadius: 8,
+                      spreadRadius: 2)
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Total Balance",
+                            style: TextStyle(color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        Text(
+                          "\$${totalBalance.toStringAsFixed(2)}",
+                          style: const TextStyle(
+                              fontSize: 26, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(Icons.account_balance_wallet,
+                      size: 36, color: Colors.blue),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Two small cards row
             Row(
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Recent spendings',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        '\$${totalRecentSpending.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text("This Month",
+                            style: TextStyle(color: Colors.black54)),
+                        const SizedBox(height: 4),
+                        Text(
+                          monthSpending.toStringAsFixed(2),
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    // navigate to messages or sync
-                  },
-                  icon: const Icon(Icons.sync),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text("Goals Progress",
+                            style: TextStyle(color: Colors.black54)),
+                        const SizedBox(height: 4),
+                        LinearProgressIndicator(
+                          value: goalCurrent / goalTarget,
+                          backgroundColor: Colors.grey.shade300,
+                          color: Colors.blue,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Trip to Europe: \$${goalCurrent.toInt()} / \$${goalTarget.toInt()}",
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 22),
 
-            // Recent list
-            const Text(
-              'Recent transactions',
-              style: TextStyle(fontSize: 13, color: Colors.black87),
+            // Recent transactions
+            const Text("Recent Transactions",
+                style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Column(
+              children: recentTransactions.map((t) {
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.red.shade50,
+                    child: const Icon(Icons.arrow_upward, color: Colors.red),
+                  ),
+                  title: Text(t["title"]),
+                  subtitle: Text(t["category"]),
+                  trailing: Text(
+                    "\$${t["amount"].toStringAsFixed(2)}",
+                    style: const TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.w500),
+                  ),
+                );
+              }).toList(),
             ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView.separated(
-                itemCount: recentMessages.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
-                itemBuilder: (context, i) {
-                  final m = recentMessages[i];
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(m.title ?? 'Unknown'),
-                    subtitle: Text(m.category ?? ''),
-                    trailing: Text(
-                      '-\$${(m.amount ?? 0.0).toStringAsFixed(2)}',
-                      style: const TextStyle(color: Colors.red),
+            const SizedBox(height: 20),
+
+            // Financial Tips
+            const Text("💡 Financial Tips",
+                style:
+                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade50,
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
-              ),
+                    child: Column(
+                      children: const [
+                        Icon(Icons.savings, color: Colors.green),
+                        SizedBox(height: 6),
+                        Text("Save 20% of your income",
+                            textAlign: TextAlign.center),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      children: const [
+                        Icon(Icons.track_changes, color: Colors.blue),
+                        SizedBox(height: 6),
+                        Text("Track your spending",
+                            textAlign: TextAlign.center),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -243,7 +355,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 /// -----------------------
 /// Log Page
 /// - user picks type: House / Car / Trip, then the form updates
@@ -562,6 +673,9 @@ class _GoalsPage1State extends State<GoalsPage1> {
 /// -----------------------
 /// Profile Page (minimal)
 /// -----------------------
+///
+///
+/*
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
   @override
@@ -598,7 +712,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-
+*/
 /// -----------------------
 /// -----------------------
 /// Demo data + simple models (replace these with your models/services)
