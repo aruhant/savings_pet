@@ -1,3 +1,5 @@
+import 'package:goals/martian_service.dart';
+
 class ShoppingItems {
   static final List<ShoppingItem> _items = [
     ShoppingItem(
@@ -100,6 +102,11 @@ class ShoppingItems {
 
   static Future<List<ShoppingItem>> get items =>
       Future.delayed(Duration(seconds: 1), () => _items);
+
+  static Future generateListForGoal(String goal) async {
+    _items = await MartianService.getItems(goal) ;
+    return _items;
+  }
 }
 
 class ShoppingItem {
