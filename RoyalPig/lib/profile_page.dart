@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:goals/rbc_investease_api_client.dart';
+import 'package:goals/user.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -9,22 +11,28 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   // Profile info
-  String _name = "John Doe";
-  String _email = "johndoe@email.com";
+  String _name = AuthService.currentClient?.name ?? "John Doe";
+  String _email = AuthService.currentClient?.email ?? "johndoe@email.com";
 
   // Goal info
   String _goalName = "Trip to Europe";
   double _goalCost = 3000;
   double _goalSaved = 1200;
 
-  final accounts = [
-    {'name': 'Checking', 'balance': 2345.12},
-    {'name': 'Savings', 'balance': 7820.55},
-    {'name': 'Credit Card', 'balance': -320.12},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    Client client = AuthService.currentClient!;
+    final accounts = [
+      {'name': 'Cash', 'balance': client.cash},
+      {
+        'name': '${client.portfolios[0].type} Investment'.toTitleCase(),
+        'balance': client.portfolios[0].currentValue,
+      },
+      {
+        'name': '${client.portfolios[1].type} Investment'.toTitleCase(),
+        'balance': client.portfolios[1].currentValue,
+      },
+    ];
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -34,10 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
             // Page Title
             Text(
               "PROFILE",
-              style: const TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
 
@@ -54,12 +59,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   Text(
                     _name,
                     style: const TextStyle(
-                        fontSize: 20, fontWeight: FontWeight.bold),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  Text(_email,
-                      style: const TextStyle(color: Colors.black54)),
-                  const Text("Joined Jan 2023",
-                      style: TextStyle(color: Colors.black38, fontSize: 12)),
+                  Text(_email, style: const TextStyle(color: Colors.black54)),
+                  Text(
+                    "Joined " +
+                        (AuthService.currentClient?.createdAt != null
+                            ? DateTime.tryParse(
+                                        AuthService.currentClient!.createdAt,
+                                      ) !=
+                                      null
+                                  ? "${_monthName(DateTime.parse(AuthService.currentClient!.createdAt).toLocal().month)} ${DateTime.parse(AuthService.currentClient!.createdAt).year}"
+                                  : AuthService.currentClient!.createdAt
+                            : "Jan 2023"),
+                    style: const TextStyle(color: Colors.black38, fontSize: 12),
+                  ),
                 ],
               ),
             ),
@@ -75,9 +91,10 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Accounts",
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text(
+                    "Accounts",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 10),
                   ...accounts.map((a) {
                     final balance = a['balance'] as double;
@@ -86,8 +103,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(a['name'] as String,
-                              style: const TextStyle(fontSize: 15)),
+                          Text(
+                            a['name'] as String,
+                            style: const TextStyle(fontSize: 15),
+                          ),
                           Text(
                             "\$${balance.toStringAsFixed(2)}",
                             style: TextStyle(
@@ -115,15 +134,12 @@ class _ProfilePageState extends State<ProfilePage> {
             _actionButton(
               icon: Icons.flag,
               text: "Edit Goal",
-              subtitle: "$_goalName (\$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)})",
+              subtitle:
+                  "$_goalName (\$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)})",
               onTap: () => _showEditGoalDialog(context),
             ),
             const SizedBox(height: 12),
-            _actionButton(
-              icon: Icons.settings,
-              text: "Settings",
-              onTap: () {},
-            ),
+            _actionButton(icon: Icons.settings, text: "Settings", onTap: () {}),
             const SizedBox(height: 12),
             _actionButton(
               icon: Icons.logout,
@@ -160,7 +176,10 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -206,13 +225,17 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
           ElevatedButton(
             onPressed: () {
               setState(() {
                 _goalName = nameController.text;
                 _goalCost = double.tryParse(costController.text) ?? _goalCost;
-                _goalSaved = double.tryParse(savedController.text) ?? _goalSaved;
+                _goalSaved =
+                    double.tryParse(savedController.text) ?? _goalSaved;
               });
               Navigator.pop(context);
             },
@@ -272,5 +295,36 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
     );
+  }
+}
+
+_monthName(int month) {
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return monthNames[month - 1];
+}
+
+extension StringCasingExtension on String {
+  String toTitleCase() {
+    if (isEmpty) return this;
+    return split(' ')
+        .map(
+          (word) => word.isEmpty
+              ? word
+              : '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}',
+        )
+        .join(' ');
   }
 }

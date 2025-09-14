@@ -84,7 +84,7 @@ class MartianService {
     OpenAI.baseUrl = 'https://api.withmartian.com';
     // Start using!
     final completion = await OpenAI.instance.chat.create(
-      model: "openai/gpt-4.1:cheapest",
+      model: "google/gemini-2.5-flash:cheapest",
       messages: [userMessage],
     );
     print(completion);

@@ -13,6 +13,10 @@ class TeamRegistration {
     'team_name': teamName,
     'contact_email': contactEmail,
   };
+
+  @override
+  String toString() =>
+      'TeamRegistration(teamName: $teamName, contactEmail: $contactEmail)';
 }
 
 class TeamAuthResponse {
@@ -32,6 +36,10 @@ class TeamAuthResponse {
         jwtToken: json['jwtToken'],
         expiresAt: json['expiresAt'],
       );
+
+  @override
+  String toString() =>
+      'TeamAuthResponse(teamId: $teamId, jwtToken: $jwtToken, expiresAt: $expiresAt)';
 }
 
 class ClientCreate {
@@ -53,6 +61,10 @@ class ClientCreate {
     'cash': cash,
     'portfolios': portfolios ?? [],
   };
+
+  @override
+  String toString() =>
+      'ClientCreate(name: $name, email: $email, cash: $cash, portfolios: $portfolios)';
 }
 
 class ClientUpdate {
@@ -65,6 +77,9 @@ class ClientUpdate {
     if (name != null) 'name': name,
     if (email != null) 'email': email,
   };
+
+  @override
+  String toString() => 'ClientUpdate(name: $name, email: $email)';
 }
 
 class Client {
@@ -100,6 +115,10 @@ class Client {
     createdAt: json['created_at'],
     updatedAt: json['updated_at'],
   );
+
+  @override
+  String toString() =>
+      'Client(id: $id, name: $name, email: $email, teamName: $teamName, portfolios: $portfolios, cash: $cash, createdAt: $createdAt, updatedAt: $updatedAt)';
 }
 
 class PortfolioCreate {
@@ -112,6 +131,10 @@ class PortfolioCreate {
     'type': type,
     'initialAmount': initialAmount,
   };
+
+  @override
+  String toString() =>
+      'PortfolioCreate(type: $type, initialAmount: $initialAmount)';
 }
 
 class Portfolio {
@@ -155,6 +178,10 @@ class Portfolio {
         .map((e) => GrowthDataPoint.fromJson(e))
         .toList(),
   );
+
+  @override
+  String toString() =>
+      'Portfolio(id: $id, clientId: $clientId, teamName: $teamName, type: $type, createdAt: $createdAt, investedAmount: $investedAmount, currentValue: $currentValue, totalMonthsSimulated: $totalMonthsSimulated, transactions: $transactions, growthTrend: $growthTrend)';
 }
 
 class Transaction {
@@ -179,6 +206,10 @@ class Transaction {
     amount: (json['amount'] as num).toDouble(),
     balanceAfter: (json['balance_after'] as num).toDouble(),
   );
+
+  @override
+  String toString() =>
+      'Transaction(id: $id, date: $date, type: $type, amount: $amount, balanceAfter: $balanceAfter)';
 }
 
 class GrowthDataPoint {
@@ -192,6 +223,9 @@ class GrowthDataPoint {
         date: json['date'],
         value: (json['value'] as num).toDouble(),
       );
+
+  @override
+  String toString() => 'GrowthDataPoint(date: $date, value: $value)';
 }
 
 class SimulationRequest {
@@ -200,6 +234,9 @@ class SimulationRequest {
   SimulationRequest({required this.months});
 
   Map<String, dynamic> toJson() => {'months': months};
+
+  @override
+  String toString() => 'SimulationRequest(months: $months)';
 }
 
 class SimulationResult {
@@ -239,6 +276,10 @@ class SimulationResult {
             .map((e) => GrowthDataPoint.fromJson(e))
             .toList(),
       );
+
+  @override
+  String toString() =>
+      'SimulationResult(portfolioId: $portfolioId, strategy: $strategy, monthsSimulated: $monthsSimulated, daysSimulated: $daysSimulated, initialValue: $initialValue, projectedValue: $projectedValue, totalGrowthPoints: $totalGrowthPoints, simulationId: $simulationId, growthTrend: $growthTrend)';
 }
 
 class MultipleSimulationResponse {
@@ -254,6 +295,10 @@ class MultipleSimulationResponse {
             .map((e) => SimulationResult.fromJson(e))
             .toList(),
       );
+
+  @override
+  String toString() =>
+      'MultipleSimulationResponse(message: $message, results: $results)';
 }
 
 class ClientDepositResponse {
@@ -267,6 +312,10 @@ class ClientDepositResponse {
         message: json['message'],
         client: Client.fromJson(json['client']),
       );
+
+  @override
+  String toString() =>
+      'ClientDepositResponse(message: $message, client: $client)';
 }
 
 class PortfolioTransferResponse {
@@ -286,6 +335,10 @@ class PortfolioTransferResponse {
         portfolio: Portfolio.fromJson(json['portfolio']),
         clientCash: json['client_cash'],
       );
+
+  @override
+  String toString() =>
+      'PortfolioTransferResponse(message: $message, portfolio: $portfolio, clientCash: $clientCash)';
 }
 
 class ErrorResponse {
@@ -294,14 +347,16 @@ class ErrorResponse {
   final String? code;
 
   ErrorResponse({required this.message, this.error, this.code});
-  String toString() =>
-      'ErrorResponse(message: $message, error: $error, code: $code)';
 
   factory ErrorResponse.fromJson(Map<String, dynamic> json) => ErrorResponse(
     message: json['message'],
     error: json['error'],
     code: json['code'],
   );
+
+  @override
+  String toString() =>
+      'ErrorResponse(message: $message, error: $error, code: $code)';
 }
 
 // API Client Class
@@ -528,4 +583,8 @@ class InvestEaseApiClient {
       return null;
     }
   }
+
+  @override
+  String toString() =>
+      'InvestEaseApiClient(baseUrl: $baseUrl, jwtToken: $_jwtToken)';
 }
