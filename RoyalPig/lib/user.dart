@@ -49,7 +49,7 @@ class AuthService {
   static get currentUserId => _currentUser?.id ?? 'demo_user';
 
   static Future<User?> login() async {
-    await demoSetup();
+    _currentUser = await demoSetup();
     if (_currentUser != null) return _currentUser;
     Auth0 auth0 = Auth0(Auth0Secrets['domain']!, Auth0Secrets['clientId']!);
     try {
@@ -112,13 +112,18 @@ class AuthService {
     _goal ??= await Goal.fetchGoalForUser(user.email);
   }
 
-  static Future<void> demoSetup() async {
+  static Future<User?> demoSetup() async {
     _currentUser = User(
       id: 'demo_user',
       name: 'Aruhant',
       email: 'a89mehta@uwaterloo.ca',
       accessToken: 'accessToken',
     );
-    await fetchUserProfile(_currentUser!);
+    try {
+      await fetchUserProfile(_currentUser!);
+    } catch (e) {
+      print('Error in demo setup: $e');
+    }
+    return _currentUser;
   }
 }
