@@ -18,6 +18,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String _goalName = "Trip to Europe";
   double _goalCost = 3000;
   double _goalSaved = 1200;
+  String _goalEndDate = "Dec 2025";
+  String _goalDescription = "Save for a trip to Europe with friends";
 
   @override
   Widget build(BuildContext context) {
@@ -31,16 +33,46 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       ),
     ];
+
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Page Title
-            Text(
-              "PROFILE",
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            // Page Title with Log Out button
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                /*
+Text(
+"PROFILE",
+style: const TextStyle(
+fontSize: 26,
+fontWeight: FontWeight.bold,
+),
+),
+*/
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.purple.shade200, width: 1),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.logout, size: 20),
+                    onPressed: () {},
+                    tooltip: 'Log Out',
+                    color: const Color.fromARGB(255, 40, 39, 41),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
 
@@ -50,36 +82,59 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   const CircleAvatar(
                     radius: 40,
+                    backgroundImage: AssetImage('assets/profile.png'),
                     backgroundColor: Colors.grey,
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                   const SizedBox(height: 12),
-                  Text(
-                    _name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        _name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        _email,
+                        style: const TextStyle(color: Colors.black54),
+                      ),
+                      Text(
+                        "Joined " +
+                            (AuthService.currentClient?.createdAt != null
+                                ? DateTime.tryParse(
+                                            AuthService
+                                                .currentClient!
+                                                .createdAt,
+                                          ) !=
+                                          null
+                                      ? "${_monthName(DateTime.parse(AuthService.currentClient!.createdAt).toLocal().month)} ${DateTime.parse(AuthService.currentClient!.createdAt).year}"
+                                      : AuthService.currentClient!.createdAt
+                                : "Jan 2023"),
+                        style: const TextStyle(
+                          color: Colors.black38,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 20),
+                        onPressed: () => _showEditProfileDialog(context),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
                   ),
                   Text(_email, style: const TextStyle(color: Colors.black54)),
-                  Text(
-                    "Joined " +
-                        (AuthService.currentClient?.createdAt != null
-                            ? DateTime.tryParse(
-                                        AuthService.currentClient!.createdAt,
-                                      ) !=
-                                      null
-                                  ? "${_monthName(DateTime.parse(AuthService.currentClient!.createdAt).toLocal().month)} ${DateTime.parse(AuthService.currentClient!.createdAt).year}"
-                                  : AuthService.currentClient!.createdAt
-                            : "Jan 2023"),
-                    style: const TextStyle(color: Colors.black38, fontSize: 12),
+                  const Text(
+                    "Joined Jan 2023",
+                    style: TextStyle(color: Colors.black38, fontSize: 12),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-
-            // Accounts card
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -124,26 +179,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
             // Separate Action Buttons
             _actionButton(
-              icon: Icons.edit,
-              text: "Edit Profile",
-              onTap: () => _showEditProfileDialog(context),
-            ),
-            const SizedBox(height: 12),
-            _actionButton(
               icon: Icons.flag,
-              text: "Edit Goal",
+              text: "Goal: Europe Trip",
               subtitle:
-                  "$_goalName (\$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)})",
+                  "$_goalEndDate\nSaved: \$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)}",
               onTap: () => _showEditGoalDialog(context),
-            ),
-            const SizedBox(height: 12),
-            _actionButton(icon: Icons.settings, text: "Settings", onTap: () {}),
-            const SizedBox(height: 12),
-            _actionButton(
-              icon: Icons.logout,
-              text: "Log Out",
-              color: Colors.red,
-              onTap: () {},
             ),
           ],
         ),
@@ -198,6 +238,8 @@ class _ProfilePageState extends State<ProfilePage> {
     final nameController = TextEditingController(text: _goalName);
     final costController = TextEditingController(text: _goalCost.toString());
     final savedController = TextEditingController(text: _goalSaved.toString());
+    final endDateController = TextEditingController(text: _goalEndDate);
+    final descriptionController = TextEditingController(text: _goalDescription);
 
     showDialog(
       context: context,
@@ -209,6 +251,15 @@ class _ProfilePageState extends State<ProfilePage> {
             TextField(
               controller: nameController,
               decoration: const InputDecoration(labelText: "Goal Name"),
+            ),
+            // short description of goal
+            TextField(
+              controller: descriptionController,
+              decoration: const InputDecoration(labelText: "Description"),
+            ),
+            TextField(
+              controller: endDateController,
+              decoration: const InputDecoration(labelText: "End Date"),
             ),
             TextField(
               controller: costController,
@@ -231,6 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onPressed: () {
               setState(() {
                 _goalName = nameController.text;
+                _goalEndDate = endDateController.text;
                 _goalCost = double.tryParse(costController.text) ?? _goalCost;
                 _goalSaved =
                     double.tryParse(savedController.text) ?? _goalSaved;
@@ -288,7 +340,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Colors.black54),
+            const Icon(Icons.edit, color: Colors.black54, size: 18),
           ],
         ),
       ),
