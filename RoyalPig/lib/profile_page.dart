@@ -8,17 +8,23 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  // Profile info
   String _name = "John Doe";
   String _email = "johndoe@email.com";
 
+  // Goal info
+  String _goalName = "Trip to Europe";
+  double _goalCost = 3000;
+  double _goalSaved = 1200;
+
+  final accounts = [
+    {'name': 'Checking', 'balance': 2345.12},
+    {'name': 'Savings', 'balance': 7820.55},
+    {'name': 'Credit Card', 'balance': -320.12},
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final accounts = [
-      {'name': 'Checking', 'balance': 2345.12},
-      {'name': 'Savings', 'balance': 7820.55},
-      {'name': 'Credit Card', 'balance': -320.12},
-    ];
-
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -50,7 +56,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  Text(_email, style: const TextStyle(color: Colors.black54)),
+                  Text(_email,
+                      style: const TextStyle(color: Colors.black54)),
                   const Text("Joined Jan 2023",
                       style: TextStyle(color: Colors.black38, fontSize: 12)),
                 ],
@@ -98,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 20),
 
-            // Action Buttons
+            // Separate Action Buttons
             _actionButton(
               icon: Icons.edit,
               text: "Edit Profile",
@@ -108,8 +115,8 @@ class _ProfilePageState extends State<ProfilePage> {
             _actionButton(
               icon: Icons.flag,
               text: "Edit Goal",
-              subtitle: "Trip to Europe",
-              onTap: () {},
+              subtitle: "$_goalName (\$${_goalSaved.toStringAsFixed(0)} / \$${_goalCost.toStringAsFixed(0)})",
+              onTap: () => _showEditGoalDialog(context),
             ),
             const SizedBox(height: 12),
             _actionButton(
@@ -130,47 +137,89 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Popup dialog for editing profile
+  // --- Edit Profile Dialog ---
   void _showEditProfileDialog(BuildContext context) {
     final nameController = TextEditingController(text: _name);
     final emailController = TextEditingController(text: _email);
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text("Edit Profile"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: "Name"),
-              ),
-              TextField(
-                controller: emailController,
-                decoration: const InputDecoration(labelText: "Email"),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context), // Cancel
-              child: const Text("Cancel"),
+      builder: (context) => AlertDialog(
+        title: const Text("Edit Profile"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: "Name"),
             ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _name = nameController.text.trim();
-                  _email = emailController.text.trim();
-                });
-                Navigator.pop(context); // Close dialog
-              },
-              child: const Text("Save"),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: "Email"),
             ),
           ],
-        );
-      },
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _name = nameController.text;
+                _email = emailController.text;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Edit Goal Dialog ---
+  void _showEditGoalDialog(BuildContext context) {
+    final nameController = TextEditingController(text: _goalName);
+    final costController = TextEditingController(text: _goalCost.toString());
+    final savedController = TextEditingController(text: _goalSaved.toString());
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Edit Goal"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: "Goal Name"),
+            ),
+            TextField(
+              controller: costController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Total Cost"),
+            ),
+            TextField(
+              controller: savedController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Amount Saved"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                _goalName = nameController.text;
+                _goalCost = double.tryParse(costController.text) ?? _goalCost;
+                _goalSaved = double.tryParse(savedController.text) ?? _goalSaved;
+              });
+              Navigator.pop(context);
+            },
+            child: const Text("Save"),
+          ),
+        ],
+      ),
     );
   }
 
