@@ -34,7 +34,7 @@ class AuthService {
   static Client? _currentClient;
 
   static Goal? _goal;
-  static Goal? get currentuser => _goal;
+  static Goal? get goal => _goal;
 
   AuthService() {
     _currentUser = User(

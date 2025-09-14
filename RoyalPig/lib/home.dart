@@ -111,11 +111,7 @@ class _HomeState extends State<Home> {
       body: <Widget>[
         /// Home page
         StatsPage(),
-        GoalsPage(
-          onAllocate: (goalKey, amount) {
-            setState(() {});
-          },
-        ),
+        StatsPage(),
 
         /// Notifications page
         ShoppingPage(
@@ -123,9 +119,9 @@ class _HomeState extends State<Home> {
             setState(() {});
           },
         ),
-        MessagePage(onNewEntry: (e) {}),
+        MessagePage(),
 
-        /// Messages page
+        /// Messages pages
       ][currentPageIndex],
     );
   }

@@ -15,16 +15,14 @@ class Goal {
   String description;
   String imageUrl;
   DateTime targetDate;
-  double progress = 0.0;
-  double totalAmount = 0.0;
+  double totalAmount;
 
   Goal({
     required this.title,
     required this.description,
     required this.targetDate,
     required this.imageUrl,
-    this.progress = 0.0,
-    this.totalAmount = 0.0,
+    this.totalAmount = 15000.0,
   });
 
   // factory constructor to create Goal from DynamoDB item
@@ -33,7 +31,6 @@ class Goal {
       title: dbValue["title"]!.s!,
       description: dbValue["description"]!.s!,
       targetDate: DateTime.parse(dbValue["targetDate"]!.s!),
-      progress: double.parse(dbValue["progress"]!.n ?? '0'),
       totalAmount: double.parse(dbValue["totalAmount"]!.n ?? '0'),
       imageUrl: dbValue["imageUrl"]!.s!,
     );
@@ -44,7 +41,6 @@ class Goal {
     dbMap["title"] = AttributeValue(s: title);
     dbMap["description"] = AttributeValue(s: description);
     dbMap["targetDate"] = AttributeValue(s: targetDate.toIso8601String());
-    dbMap["progress"] = AttributeValue(n: progress.toString());
     dbMap["totalAmount"] = AttributeValue(n: totalAmount.toString());
     dbMap["imageUrl"] = AttributeValue(s: imageUrl);
     return dbMap;
@@ -77,82 +73,15 @@ class Goal {
     _goal =
         response ??
         Goal(
-          title: 'No Goal',
-          description: 'Set a new goal',
-          targetDate: DateTime.now(),
+          title: 'Europe Trip',
+          description: 'Graduation goal',
+          targetDate: DateTime.now().add(Duration(days: 365 * 4)),
+          totalAmount: 15000,
           imageUrl: '',
         );
 
     await _goal!.save();
     return _goal!;
-  }
-}
-
-class GoalsPage extends StatefulWidget {
-  const GoalsPage({
-    Key? key,
-    required Null Function(dynamic goalKey, dynamic amount) onAllocate,
-  }) : super(key: key);
-
-  @override
-  State<GoalsPage> createState() => _GoalsPageState();
-}
-
-class _GoalsPageState extends State<GoalsPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  void _refreshGoal() {
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Goal goal = Goal.currentUserGoal!;
-
-    final daysToGo = goal.targetDate.difference(DateTime.now()).inDays;
-    final completionPercentage = goal.totalAmount > 0
-        ? (goal.progress / goal.totalAmount)
-        : 0.0;
-    return Scaffold(
-      appBar: AppBar(title: const Text('Goals')),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (_) => GoalEditor(onSave: _refreshGoal),
-          );
-        },
-        child: const Icon(Icons.edit),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              goal.title,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            if (goal.imageUrl.isNotEmpty)
-              Image.network(goal.imageUrl, height: 200, fit: BoxFit.cover),
-            const SizedBox(height: 16),
-            Text(goal.description, style: const TextStyle(fontSize: 16)),
-            const SizedBox(height: 16),
-            Text(
-              'Completion: ${(completionPercentage * 100).toStringAsFixed(1)}%',
-              style: const TextStyle(fontSize: 18),
-            ),
-            LinearProgressIndicator(value: completionPercentage),
-            const SizedBox(height: 16),
-            Text('Days to go: $daysToGo', style: const TextStyle(fontSize: 18)),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -289,7 +218,6 @@ class _GoalEditorState extends State<GoalEditor> {
                 imageUrl: _imageUrl,
                 targetDate: _targetDate,
                 totalAmount: _totalAmount,
-                progress: 0.0,
               );
               newGoal.save().then((_) {
                 Navigator.of(context).pop();

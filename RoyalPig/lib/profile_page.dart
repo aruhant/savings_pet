@@ -24,14 +24,12 @@ class _ProfilePageState extends State<ProfilePage> {
     Client client = AuthService.currentClient!;
     final accounts = [
       {'name': 'Cash', 'balance': client.cash},
-      {
-        'name': '${client.portfolios[0].type} Investment'.toTitleCase(),
-        'balance': client.portfolios[0].currentValue,
-      },
-      {
-        'name': '${client.portfolios[1].type} Investment'.toTitleCase(),
-        'balance': client.portfolios[1].currentValue,
-      },
+      ...client.portfolios.map(
+        (portfolio) => {
+          'name': '${portfolio.type} Investment'.toTitleCase(),
+          'balance': portfolio.currentValue,
+        },
+      ),
     ];
     return SafeArea(
       child: SingleChildScrollView(

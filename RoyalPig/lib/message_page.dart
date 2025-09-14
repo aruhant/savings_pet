@@ -8,8 +8,7 @@ import 'dynamo_stream_listener.dart';
 import 'sms_service.dart';
 
 class MessagePage extends StatefulWidget {
-  const MessagePage({Key? key, required Null Function(dynamic e) onNewEntry})
-    : super(key: key);
+  const MessagePage({Key? key}) : super(key: key);
 
   @override
   State<MessagePage> createState() => _MessagePageState();

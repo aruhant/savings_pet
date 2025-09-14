@@ -55,6 +55,7 @@ class _RootScaffoldState extends State<RootScaffold> {
     // DynamoService ds = DynamoService();
     // ds.getAll(tableName: 'messages')...
     AuthService.login().then((user) {
+      setState(() {});
       if (user != null) {
         print('Logged in as ${user.name} (${user.email} - ${user.id})');
       } else {
@@ -80,15 +81,13 @@ class _RootScaffoldState extends State<RootScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    if (AuthService.currentClient == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
     final pages = <Widget>[
-      HomePage(userName: _userName),
+      HomePage(),
       StatsPage(),
-      MessagePage(
-        onNewEntry: (e) {
-          DemoData.addMessage(e);
-          setState(() {});
-        },
-      ),
+      MessagePage(),
       ShoppingPage(
         onPurchase: (goalKey, amount) {
           DemoData.allocateToGoal(goalKey, amount);
@@ -102,7 +101,8 @@ class _RootScaffoldState extends State<RootScaffold> {
           setState(() {});
         },
       ),
-      */ ProfilePage(),
+      */
+      ProfilePage(),
     ];
 
     final icons = [
@@ -140,7 +140,6 @@ class _RootScaffoldState extends State<RootScaffold> {
     );
   }
 }
-
 
 /// -----------------------
 /// Log Page

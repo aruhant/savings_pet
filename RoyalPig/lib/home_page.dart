@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:goals/message_page.dart';
+import 'package:goals/rbc_investease_api_client.dart';
+import 'package:goals/user.dart';
+
 /// -----------------------
 /// Home Page
 /// -----------------------
 class HomePage extends StatefulWidget {
-  final String userName;
-  const HomePage({super.key, required this.userName});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -15,7 +18,17 @@ class _HomePageState extends State<HomePage> {
   double totalBalance = 2059.28;
   double monthSpending = -353.48;
   double goalCurrent = 798;
-  double goalTarget = 3000;
+  double goalTarget = 8000;
+  Client client = AuthService.currentClient!;
+
+  @override
+  void initState() {
+    super.initState();
+    goalCurrent = client.portfolios
+        .map((account) => account.currentValue)
+        .reduce((a, b) => a + b);
+    totalBalance = client.cash + goalCurrent;
+  }
 
   List<Map<String, dynamic>> recentTransactions = [
     {"title": "Star Café", "category": "Shopping", "amount": 87.66},
@@ -33,7 +46,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             // Welcome text
             Text(
-              "Welcome back, ${widget.userName} 👋",
+              "Welcome back, ${client.name} 👋",
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 18),
@@ -96,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       children: [
                         const Text(
-                          "This Month",
+                          "Monthly Spending",
                           style: TextStyle(color: Colors.black54),
                         ),
                         const SizedBox(height: 4),
@@ -145,14 +158,14 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 22),
-
+            /*
             // Recent transactions
             const Text(
               "Recent Transactions",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Column(
+               Column(
               children: recentTransactions.map((t) {
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -171,7 +184,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               }).toList(),
-            ),
+            ),*/
+            // MessagePage(),
             const SizedBox(height: 20),
 
             // Financial Tips

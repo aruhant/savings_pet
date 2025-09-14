@@ -1,7 +1,7 @@
 import 'package:goals/martian_service.dart';
 
 class ShoppingItems {
-  static final List<ShoppingItem> _items = [
+  static List<ShoppingItem> _items = [
     ShoppingItem(
       title: 'Round-trip flight to Europe',
       subtitle:
@@ -77,8 +77,7 @@ class ShoppingItems {
       place: 'Paris',
       date: 'Jul 2, 2029',
       price: 18.00,
-      imageUrl:
-          'https://thumbs.dreamstime.com/b/cruise-clipart-9321986.jpg',
+      imageUrl: 'https://thumbs.dreamstime.com/b/cruise-clipart-9321986.jpg',
     ),
     ShoppingItem(
       title: 'Dinner in Le Marais',
@@ -104,7 +103,7 @@ class ShoppingItems {
       Future.delayed(Duration(seconds: 1), () => _items);
 
   static Future generateListForGoal(String goal) async {
-    _items = await MartianService.getItems(goal) ;
+    _items = await MartianService.getItems(goal);
     return _items;
   }
 }
