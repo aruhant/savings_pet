@@ -54,10 +54,6 @@ fontWeight: FontWeight.bold,
 ),
 */
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
                   decoration: BoxDecoration(
                     color: Colors.purple.shade50,
                     borderRadius: BorderRadius.circular(8),
@@ -80,57 +76,42 @@ fontWeight: FontWeight.bold,
             Center(
               child: Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 40,
-                    backgroundImage: AssetImage('assets/profile.png'),
-                    backgroundColor: Colors.grey,
+                  GestureDetector(
+                    child: const CircleAvatar(
+                      radius: 40,
+                      backgroundImage: AssetImage('assets/profile.png'),
+                      backgroundColor: Colors.grey,
+                    ),
+                    onTap: () => _showEditProfileDialog(context),
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _name,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        _email,
-                        style: const TextStyle(color: Colors.black54),
-                      ),
-                      Text(
-                        "Joined " +
-                            (AuthService.currentClient?.createdAt != null
-                                ? DateTime.tryParse(
-                                            AuthService
-                                                .currentClient!
-                                                .createdAt,
-                                          ) !=
-                                          null
-                                      ? "${_monthName(DateTime.parse(AuthService.currentClient!.createdAt).toLocal().month)} ${DateTime.parse(AuthService.currentClient!.createdAt).year}"
-                                      : AuthService.currentClient!.createdAt
-                                : "Jan 2023"),
-                        style: const TextStyle(
-                          color: Colors.black38,
-                          fontSize: 12,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        icon: const Icon(Icons.edit, size: 20),
-                        onPressed: () => _showEditProfileDialog(context),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                    ],
+                  Text(
+                    _name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   Text(_email, style: const TextStyle(color: Colors.black54)),
-                  const Text(
-                    "Joined Jan 2023",
-                    style: TextStyle(color: Colors.black38, fontSize: 12),
+                  Text(
+                    "Joined " +
+                        (AuthService.currentClient?.createdAt != null
+                            ? DateTime.tryParse(
+                                        AuthService.currentClient!.createdAt,
+                                      ) !=
+                                      null
+                                  ? "${_monthName(DateTime.parse(AuthService.currentClient!.createdAt).toLocal().month)} ${DateTime.parse(AuthService.currentClient!.createdAt).year}"
+                                  : AuthService.currentClient!.createdAt
+                            : "Jan 2023"),
+                    style: const TextStyle(color: Colors.black38, fontSize: 12),
                   ),
+                  const SizedBox(width: 8),
+                  // IconButton(
+                  //   icon: const Icon(Icons.edit, size: 20),
+                  //   onPressed: () => _showEditProfileDialog(context),
+                  //   padding: EdgeInsets.zero,
+                  //   constraints: const BoxConstraints(),
+                  // ),
                 ],
               ),
             ),
