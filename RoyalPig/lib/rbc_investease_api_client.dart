@@ -145,8 +145,8 @@ class Portfolio {
     teamName: json['team_name'],
     type: json['type'],
     createdAt: json['created_at'],
-    investedAmount: json['invested_amount'],
-    currentValue: json['current_value'],
+    investedAmount: (json['invested_amount'] as num).toDouble(),
+    currentValue: (json['current_value'] as num).toDouble(),
     totalMonthsSimulated: json['total_months_simulated'],
     transactions: (json['transactions'] as List)
         .map((e) => Transaction.fromJson(e))
@@ -176,8 +176,8 @@ class Transaction {
     id: json['id'],
     date: json['date'],
     type: json['type'],
-    amount: json['amount'],
-    balanceAfter: json['balance_after'],
+    amount: (json['amount'] as num).toDouble(),
+    balanceAfter: (json['balance_after'] as num).toDouble(),
   );
 }
 
@@ -188,7 +188,10 @@ class GrowthDataPoint {
   GrowthDataPoint({required this.date, required this.value});
 
   factory GrowthDataPoint.fromJson(Map<String, dynamic> json) =>
-      GrowthDataPoint(date: json['date'], value: json['value']);
+      GrowthDataPoint(
+        date: json['date'],
+        value: (json['value'] as num).toDouble(),
+      );
 }
 
 class SimulationRequest {
