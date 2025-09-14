@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:goals/home_page.dart';
+import 'package:goals/rbc_investease_api_client.dart';
+import 'package:goals/shopping_items.dart';
 import 'package:goals/sms_service.dart';
 import 'package:goals/stats_page.dart';
 import 'package:goals/message_page.dart';
@@ -89,9 +91,39 @@ class _RootScaffoldState extends State<RootScaffold> {
       StatsPage(),
       MessagePage(),
       ShoppingPage(
-        onPurchase: (goalKey, amount) {
-          DemoData.allocateToGoal(goalKey, amount);
-          setState(() {});
+        onPurchase: (goalKey, amount) async {
+          bool? confirmed = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('Confirm Investment'),
+                content: Text(
+                  'Invest \$${amount.toStringAsFixed(2)} in ${(goalKey as ShoppingItem).portfolio} portfolio towards your goal? ',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      InvestEaseApiClient.investInPortfolio(
+                        AuthService.currentClient!,
+                        (goalKey as ShoppingItem).portfolio,
+                        amount,
+                      );
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Confirm'),
+                  ),
+                ],
+              );
+            },
+          );
+          if (confirmed == true) {
+            // Add purchase logic here if needed
+            setState(() {});
+          }
         },
       ),
       /*

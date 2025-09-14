@@ -9,7 +9,7 @@ class _ArticleDescription extends StatelessWidget {
     required this.date,
     required this.price,
     required this.goalKey,
-    required Null Function(dynamic goalKey, dynamic amount) this.onPurchase,
+    required Function(dynamic goalKey, dynamic amount) this.onPurchase,
   });
 
   final String title;
@@ -18,7 +18,7 @@ class _ArticleDescription extends StatelessWidget {
   final String date;
   final double price;
   final dynamic goalKey;
-  final Null Function(dynamic goalKey, dynamic amount) onPurchase;
+  final Function(dynamic goalKey, dynamic amount) onPurchase;
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +74,7 @@ class ProductListItem extends StatelessWidget {
     required this.date,
     required this.price,
     required this.goalKey,
-    required Null Function(dynamic goalKey, dynamic amount) this.onPurchase,
+    required Function(dynamic goalKey, dynamic amount) this.onPurchase,
   });
 
   final Widget thumbnail;
@@ -84,7 +84,7 @@ class ProductListItem extends StatelessWidget {
   final String date;
   final double price;
   final dynamic goalKey;
-  final Null Function(dynamic goalKey, dynamic amount) onPurchase;
+  final Function(dynamic goalKey, dynamic amount) onPurchase;
 
   @override
   Widget build(BuildContext context) {
@@ -120,10 +120,10 @@ class ProductListItem extends StatelessWidget {
 class ShoppingPage extends StatefulWidget {
   const ShoppingPage({
     super.key,
-    required Null Function(dynamic goalKey, dynamic amount) this.onPurchase,
+    required Function(dynamic goalKey, dynamic amount) this.onPurchase,
   });
 
-  final Null Function(dynamic goalKey, dynamic amount) onPurchase;
+  final Function(dynamic goalKey, dynamic amount) onPurchase;
 
   @override
   State<ShoppingPage> createState() => _ShoppingPageState();

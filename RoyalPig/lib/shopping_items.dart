@@ -11,6 +11,7 @@ class ShoppingItems {
       price: 1000.00,
       imageUrl:
           'https://img.freepik.com/premium-vector/airplane-clip-art-white-background-cartoon-style-vector-illustration_1195672-98.jpg',
+      portfolio: 'balanced',
     ),
     ShoppingItem(
       title: 'Travel Insurance',
@@ -21,6 +22,7 @@ class ShoppingItems {
       price: 100.00,
       imageUrl:
           'https://media.istockphoto.com/id/1283419859/vector/bandage-icon-on-transparent-background.jpg?s=612x612&w=0&k=20&c=HPn4O1RvzuS2ckbqCioCiTUJ5XImEnUaQqBOMJhd4ys=',
+      portfolio: 'balanced',
     ),
     ShoppingItem(
       title: 'SIM Card/eSIM for Europe',
@@ -31,6 +33,7 @@ class ShoppingItems {
       price: 30.00,
       imageUrl:
           'https://img.freepik.com/premium-vector/sim-card-clip-art-vector-design-with-white-background_579306-12144.jpg',
+      portfolio: 'balanced',
     ),
     // Day 1: Paris
     ShoppingItem(
@@ -41,6 +44,7 @@ class ShoppingItems {
       price: 180.00,
       imageUrl:
           'https://media.istockphoto.com/id/1069967580/vector/hotel-isolated-on-city-street-vector-illustration-flat-modern-skyscraper-hotel-building-near.jpg?s=612x612&w=0&k=20&c=IGAFFsCn84kLidKR95k6UYGNHyZI0ugSzmDqpY0rwt0=',
+      portfolio: 'balanced',
     ),
     ShoppingItem(
       title: 'Coffee & Croissant',
@@ -50,6 +54,7 @@ class ShoppingItems {
       price: 8.00,
       imageUrl:
           'https://media.istockphoto.com/id/1177931528/vector/coffee-and-croissant-in-flat-style-vector-illustration.jpg?s=612x612&w=0&k=20&c=ssoQY3pZSSIRY2AMpVkFy6q4f6tuzof3zAqvokzj1gA=',
+      portfolio: 'balanced',
     ),
     ShoppingItem(
       title: 'Paris Metro Ticket',
@@ -59,6 +64,7 @@ class ShoppingItems {
       price: 2.50,
       imageUrl:
           'https://img.freepik.com/premium-vector/train-clipart-cartoon-style-vector-illustration_761413-3955.jpg',
+      portfolio: 'balanced',
     ),
     ShoppingItem(
       title: 'Lunch at a Boulangerie',
@@ -69,6 +75,7 @@ class ShoppingItems {
       price: 15.00,
       imageUrl:
           'https://media.istockphoto.com/id/1153262021/vector/sub-sandwich-illustration.jpg?s=612x612&w=0&k=20&c=mRPnmtgubNKyeNXqdmEd6wrMS6rxADjP_pgocHeOFsg=',
+      portfolio: 'balanced',
     ),
     ShoppingItem(
       title: 'Seine River Cruise',
@@ -78,6 +85,7 @@ class ShoppingItems {
       date: 'Jul 2, 2029',
       price: 18.00,
       imageUrl: 'https://thumbs.dreamstime.com/b/cruise-clipart-9321986.jpg',
+      portfolio: 'growth',
     ),
     ShoppingItem(
       title: 'Dinner in Le Marais',
@@ -87,6 +95,7 @@ class ShoppingItems {
       price: 45.00,
       imageUrl:
           'https://img.freepik.com/premium-vector/steak-dinner-plate-clip-art-vector-design-with-white-background_579306-14313.jpg',
+      portfolio: 'growth',
     ),
     ShoppingItem(
       title: 'Gelato/Dessert',
@@ -96,6 +105,7 @@ class ShoppingItems {
       price: 7.00,
       imageUrl:
           'https://i0.wp.com/pearlyarts.com/wp-content/uploads/2021/11/Mint-ice-cream-Clipart-WM.png',
+      portfolio: 'growth',
     ),
   ];
 
@@ -114,6 +124,7 @@ class ShoppingItem {
   final String place;
   final String date;
   final double price;
+  final String portfolio;
   final String imageUrl;
 
   ShoppingItem({
@@ -123,5 +134,6 @@ class ShoppingItem {
     required this.date,
     required this.price,
     required this.imageUrl,
+    required this.portfolio,
   });
 }

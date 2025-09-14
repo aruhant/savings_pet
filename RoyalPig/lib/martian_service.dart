@@ -107,6 +107,7 @@ class MartianService {
                 subtitle: e['subtitle'] ?? '',
                 place: e['place'] ?? '',
                 date: e['date'] ?? '',
+                portfolio: 'balanced',
                 price: (e['price'] is num) ? e['price'].toDouble() : 0.0,
                 imageUrl: '', // Default image URL since not provided in JSON
               ),

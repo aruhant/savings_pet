@@ -587,4 +587,30 @@ class InvestEaseApiClient {
   @override
   String toString() =>
       'InvestEaseApiClient(baseUrl: $baseUrl, jwtToken: $_jwtToken)';
+  static String findPortfolioIDFromtype(Client client, String type) {
+    try {
+      Portfolio portfolio = client.portfolios.firstWhere((p) => p.type == type);
+      print('Found portfolio ID: ${portfolio.id} for type: $type');
+      return portfolio.id;
+    } catch (e) {
+      print('No portfolio found for type $type: $e');
+    }
+    return '';
+  }
+
+  static void investInPortfolio(Client client, String portfolio, amount) {
+    String portfolioId = findPortfolioIDFromtype(client, portfolio);
+    if (portfolioId.isNotEmpty) {
+      InvestEaseApiClient()
+          .transferToPortfolio(portfolioId, amount)
+          .then((response) {
+            print('Successfully invested \$$amount into $portfolio portfolio.');
+          })
+          .catchError((error) {
+            print('Error investing in portfolio: $error');
+          });
+    } else {
+      print('Cannot invest: Portfolio of type $portfolio not found.');
+    }
+  }
 }
