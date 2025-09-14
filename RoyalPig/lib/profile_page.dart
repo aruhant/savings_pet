@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  String _name = "John Doe";
+  String _email = "johndoe@email.com";
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +45,12 @@ class ProfilePage extends StatelessWidget {
                     child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    "John Doe",
-                    style: TextStyle(
+                  Text(
+                    _name,
+                    style: const TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  const Text("johndoe@email.com",
-                      style: TextStyle(color: Colors.black54)),
+                  Text(_email, style: const TextStyle(color: Colors.black54)),
                   const Text("Joined Jan 2023",
                       style: TextStyle(color: Colors.black38, fontSize: 12)),
                 ],
@@ -91,11 +98,11 @@ class ProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Separate Action Buttons
+            // Action Buttons
             _actionButton(
               icon: Icons.edit,
               text: "Edit Profile",
-              onTap: () {},
+              onTap: () => _showEditProfileDialog(context),
             ),
             const SizedBox(height: 12),
             _actionButton(
@@ -120,6 +127,50 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // Popup dialog for editing profile
+  void _showEditProfileDialog(BuildContext context) {
+    final nameController = TextEditingController(text: _name);
+    final emailController = TextEditingController(text: _email);
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Edit Profile"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: "Name"),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: "Email"),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context), // Cancel
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _name = nameController.text.trim();
+                  _email = emailController.text.trim();
+                });
+                Navigator.pop(context); // Close dialog
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -174,4 +225,3 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
-
