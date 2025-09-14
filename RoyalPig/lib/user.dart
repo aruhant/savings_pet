@@ -1,6 +1,7 @@
 import 'package:auth0_flutter/auth0_flutter.dart';
 import 'package:goals/goals_page.dart';
 import 'package:goals/secrets.dart';
+import 'rbc_investease_api_client.dart';
 
 class User {
   final String id;
@@ -29,11 +30,26 @@ class AuthService {
   static User? _currentUser;
   static User? get currentUser => _currentUser;
 
-  AuthService();
+  static Client? get currentClient => _currentClient;
+  static Client? _currentClient;
+
+  static Goal? _goal;
+  static Goal? get currentuser => _goal;
+
+  AuthService() {
+    _currentUser = User(
+      id: 'demo_user',
+      name: 'Aruhant',
+      email: 'a89mehta@uwaterloo.ca',
+      accessToken: 'accessToken',
+    );
+    fetchUserProfile(_currentUser!);
+  }
 
   static get currentUserId => _currentUser?.id ?? 'demo_user';
 
   static Future<User?> login() async {
+    if (_currentUser != null) return _currentUser;
     Auth0 auth0 = Auth0(Auth0Secrets['domain']!, Auth0Secrets['clientId']!);
     try {
       final credentials = await auth0.credentialsManager.credentials();
@@ -65,6 +81,33 @@ class AuthService {
   }
 
   static Future<void> fetchUserProfile(User user) async {
-    await Goal.userGoal(user);
+    if (user.email.isEmpty) {
+      print('User email is empty, cannot fetch profile.');
+      return;
+    }
+    if (_currentClient == null) {
+      _currentClient = await InvestEaseApiClient().getClientByEmail(user.email);
+      if (_currentClient == null) {
+        try {
+          _currentClient = await InvestEaseApiClient().createClient(
+            ClientCreate(
+              name: currentUser!.name,
+              email: currentUser!.email,
+              cash: 1000.0,
+              portfolios: [
+                {"type": "balanced", "initialAmount": 10000},
+              ],
+            ),
+          );
+          print('Created new investment account: $_currentClient');
+        } catch (e) {
+          print('Error creating investment account: $e');
+        }
+      } else {
+        print('Fetched existing investment account: $_currentClient');
+      }
+    }
+
+    _goal ??= await Goal.fetchGoalForUser(user.email);
   }
 }

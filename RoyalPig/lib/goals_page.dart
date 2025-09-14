@@ -17,8 +17,6 @@ class Goal {
   DateTime targetDate;
   double progress = 0.0;
   double totalAmount = 0.0;
-  String investmentID;
-  double investedAmount = 0.0;
 
   Goal({
     required this.title,
@@ -27,8 +25,6 @@ class Goal {
     required this.imageUrl,
     this.progress = 0.0,
     this.totalAmount = 0.0,
-    this.investmentID = '',
-    this.investedAmount = 0.0,
   });
 
   // factory constructor to create Goal from DynamoDB item
@@ -40,8 +36,6 @@ class Goal {
       progress: double.parse(dbValue["progress"]!.n ?? '0'),
       totalAmount: double.parse(dbValue["totalAmount"]!.n ?? '0'),
       imageUrl: dbValue["imageUrl"]!.s!,
-      investmentID: dbValue["investmentID"]?.s ?? '',
-      investedAmount: double.parse(dbValue["investedAmount"]?.n ?? '0'),
     );
   }
 
@@ -53,8 +47,6 @@ class Goal {
     dbMap["progress"] = AttributeValue(n: progress.toString());
     dbMap["totalAmount"] = AttributeValue(n: totalAmount.toString());
     dbMap["imageUrl"] = AttributeValue(s: imageUrl);
-    dbMap["investmentID"] = AttributeValue(s: investmentID);
-    dbMap["investedAmount"] = AttributeValue(n: investedAmount.toString());
     return dbMap;
   }
 
@@ -72,9 +64,9 @@ class Goal {
 
   static Goal? _goal;
   static Goal? get currentUserGoal => _goal;
-  static Future<Goal> userGoal(User currentUser) async {
+  static Future<Goal> fetchGoalForUser(String email) async {
     if (_goal != null) return _goal!;
-    print('Fetching goal for user: ${currentUser.email}');
+    print('Fetching goal for user: ${email}');
     final response = await DynamoService().getItem<Goal>(
       tableName: "goals",
       fromJson: (json) => Goal.fromJson(json),
@@ -82,49 +74,12 @@ class Goal {
 
     print('Fetched goal: $response');
 
-    if (response != null) {
-      return _goal = response;
-    }
-    print('No goal found, checking investment account');
-    Client? client;
-    try {
-      client = await ApiClient().getClientByEmail(currentUser.email);
-    } catch (e) {
-      print('Error fetching client by email: $e');
-    }
-
-    print('Fetched investment account: $client');
-    if (client == null) {
-      try {
-        client = await ApiClient().createClient(
-          ClientCreate(
-            name: currentUser.name,
-            email: currentUser.email,
-            cash: 1000.0,
-            portfolios: ['balanced'],
-          ),
-        );
-      } catch (e) {
-        print('Error creating investment account: ${e}');
-        return Goal(
-          title: 'No Goal',
-          description: 'Set a new goal',
-          targetDate: DateTime.now(),
-          investmentID: '',
-          imageUrl: '',
-        );
-      }
-    }
-
-    print('Created investment account: ${client.id}');
-
     _goal =
         response ??
         Goal(
           title: 'No Goal',
           description: 'Set a new goal',
           targetDate: DateTime.now(),
-          investmentID: client.id,
           imageUrl: '',
         );
 
@@ -335,8 +290,6 @@ class _GoalEditorState extends State<GoalEditor> {
                 targetDate: _targetDate,
                 totalAmount: _totalAmount,
                 progress: 0.0,
-                investmentID: _investmentID,
-                investedAmount: _investedAmount,
               );
               newGoal.save().then((_) {
                 Navigator.of(context).pop();

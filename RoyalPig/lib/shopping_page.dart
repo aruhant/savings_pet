@@ -8,6 +8,8 @@ class _ArticleDescription extends StatelessWidget {
     required this.place,
     required this.date,
     required this.price,
+    required this.goalKey,
+    required Null Function(dynamic goalKey, dynamic amount) this.onPurchase,
   });
 
   final String title;
@@ -15,6 +17,8 @@ class _ArticleDescription extends StatelessWidget {
   final String place;
   final String date;
   final double price;
+  final dynamic goalKey;
+  final Null Function(dynamic goalKey, dynamic amount) onPurchase;
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +53,7 @@ class _ArticleDescription extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                // Handle button press
+                onPurchase(goalKey, price);
               },
               child: const Text('Buy'),
             ),
@@ -69,6 +73,8 @@ class ProductListItem extends StatelessWidget {
     required this.place,
     required this.date,
     required this.price,
+    required this.goalKey,
+    required Null Function(dynamic goalKey, dynamic amount) this.onPurchase,
   });
 
   final Widget thumbnail;
@@ -77,6 +83,8 @@ class ProductListItem extends StatelessWidget {
   final String place;
   final String date;
   final double price;
+  final dynamic goalKey;
+  final Null Function(dynamic goalKey, dynamic amount) onPurchase;
 
   @override
   Widget build(BuildContext context) {
@@ -92,11 +100,13 @@ class ProductListItem extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20.0, 0.0, 2.0, 0.0),
                 child: _ArticleDescription(
+                  onPurchase: onPurchase,
                   title: title,
                   subtitle: subtitle,
                   place: place,
                   date: date,
                   price: price,
+                  goalKey: goalKey,
                 ),
               ),
             ),
@@ -110,8 +120,10 @@ class ProductListItem extends StatelessWidget {
 class ShoppingPage extends StatefulWidget {
   const ShoppingPage({
     super.key,
-    required Null Function(dynamic goalKey, dynamic amount) onPurchase,
+    required Null Function(dynamic goalKey, dynamic amount) this.onPurchase,
   });
+
+  final Null Function(dynamic goalKey, dynamic amount) onPurchase;
 
   @override
   State<ShoppingPage> createState() => _ShoppingPageState();
@@ -137,12 +149,14 @@ class _ShoppingPageState extends State<ShoppingPage> {
         padding: const EdgeInsets.all(10.0),
         children: items.map((item) {
           return ProductListItem(
+            onPurchase: widget.onPurchase,
             thumbnail: Image.network(item.imageUrl, fit: BoxFit.cover),
             title: item.title,
             subtitle: item.subtitle,
             place: item.place,
             date: item.date,
             price: item.price,
+            goalKey: item,
           );
         }).toList(),
       ),

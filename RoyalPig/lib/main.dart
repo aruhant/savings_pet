@@ -10,9 +10,8 @@ import 'package:goals/sms_service.dart';
 import 'package:goals/stats_page.dart';
 import 'package:goals/message_page.dart';
 import 'package:goals/shopping_page.dart';
-import 'package:goals/temp_main.dart';
+import 'package:goals/profile_page.dart';
 import 'package:goals/user.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -97,14 +96,15 @@ class _RootScaffoldState extends State<RootScaffold> {
           DemoData.allocateToGoal(goalKey, amount);
           setState(() {});
         },
-      ),/*
+      ),
+      /*
       GoalsPage(
         onAllocate: (goalKey, amount) {
           DemoData.allocateToGoal(goalKey, amount);
           setState(() {});
         },
       ),
-      */      ProfilePage(),
+      */ ProfilePage(),
     ];
 
     final icons = [
@@ -178,10 +178,7 @@ class _HomePageState extends State<HomePage> {
             // Welcome text
             Text(
               "Welcome back, ${widget.userName} 👋",
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 18),
 
@@ -193,9 +190,10 @@ class _HomePageState extends State<HomePage> {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.grey.shade200,
-                      blurRadius: 8,
-                      spreadRadius: 2)
+                    color: Colors.grey.shade200,
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  ),
                 ],
               ),
               child: Row(
@@ -204,19 +202,26 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Total Balance",
-                            style: TextStyle(color: Colors.grey)),
+                        const Text(
+                          "Total Balance",
+                          style: TextStyle(color: Colors.grey),
+                        ),
                         const SizedBox(height: 6),
                         Text(
                           "\$${totalBalance.toStringAsFixed(2)}",
                           style: const TextStyle(
-                              fontSize: 26, fontWeight: FontWeight.bold),
+                            fontSize: 26,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const Icon(Icons.account_balance_wallet,
-                      size: 36, color: Colors.blue),
+                  const Icon(
+                    Icons.account_balance_wallet,
+                    size: 36,
+                    color: Colors.blue,
+                  ),
                 ],
               ),
             ),
@@ -234,15 +239,18 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: Column(
                       children: [
-                        const Text("This Month",
-                            style: TextStyle(color: Colors.black54)),
+                        const Text(
+                          "This Month",
+                          style: TextStyle(color: Colors.black54),
+                        ),
                         const SizedBox(height: 4),
                         Text(
                           monthSpending.toStringAsFixed(2),
                           style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
                         ),
                       ],
                     ),
@@ -259,8 +267,10 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Goals Progress",
-                            style: TextStyle(color: Colors.black54)),
+                        const Text(
+                          "Goals Progress",
+                          style: TextStyle(color: Colors.black54),
+                        ),
                         const SizedBox(height: 4),
                         LinearProgressIndicator(
                           value: goalCurrent / goalTarget,
@@ -281,9 +291,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 22),
 
             // Recent transactions
-            const Text("Recent Transactions",
-                style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text(
+              "Recent Transactions",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             Column(
               children: recentTransactions.map((t) {
@@ -298,7 +309,9 @@ class _HomePageState extends State<HomePage> {
                   trailing: Text(
                     "\$${t["amount"].toStringAsFixed(2)}",
                     style: const TextStyle(
-                        color: Colors.red, fontWeight: FontWeight.w500),
+                      color: Colors.red,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 );
               }).toList(),
@@ -306,9 +319,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
 
             // Financial Tips
-            const Text("💡 Financial Tips",
-                style:
-                    TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text(
+              "💡 Financial Tips",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -323,8 +337,10 @@ class _HomePageState extends State<HomePage> {
                       children: const [
                         Icon(Icons.savings, color: Colors.green),
                         SizedBox(height: 6),
-                        Text("Save 20% of your income",
-                            textAlign: TextAlign.center),
+                        Text(
+                          "Save 20% of your income",
+                          textAlign: TextAlign.center,
+                        ),
                       ],
                     ),
                   ),
@@ -341,8 +357,10 @@ class _HomePageState extends State<HomePage> {
                       children: const [
                         Icon(Icons.track_changes, color: Colors.blue),
                         SizedBox(height: 6),
-                        Text("Track your spending",
-                            textAlign: TextAlign.center),
+                        Text(
+                          "Track your spending",
+                          textAlign: TextAlign.center,
+                        ),
                       ],
                     ),
                   ),
@@ -355,6 +373,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
 /// -----------------------
 /// Log Page
 /// - user picks type: House / Car / Trip, then the form updates

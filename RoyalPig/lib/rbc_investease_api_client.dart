@@ -38,7 +38,7 @@ class ClientCreate {
   final String name;
   final String email;
   final double cash;
-  final List<String>? portfolios;
+  final List<dynamic>? portfolios;
 
   ClientCreate({
     required this.name,
@@ -302,7 +302,7 @@ class ErrorResponse {
 }
 
 // API Client Class
-class ApiClient {
+class InvestEaseApiClient {
   static const String baseUrl =
       'https://2dcq63co40.execute-api.us-east-1.amazonaws.com/dev';
   String _jwtToken = SecretsRBC['jwtToken']!;
