@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:goals/dynamo_service.dart';
+import 'package:goals/log_entry.dart';
 import 'package:goals/message_page.dart';
 import 'package:goals/rbc_investease_api_client.dart';
 import 'package:goals/user.dart';
@@ -28,12 +30,31 @@ class _HomePageState extends State<HomePage> {
         .map((account) => account.currentValue)
         .reduce((a, b) => a + b);
     totalBalance = client.cash + goalCurrent;
+
+    DynamoService().getAll(tableName: 'messages').then((transactions) {
+      setState(() {
+        recentTransactions = transactions!
+            .map((item) => LogEntry.fromDBValue(item))
+            .map(
+              (log) => {
+                "title": log.merchant ?? 'Unknown',
+                "category": log.category,
+                "date": log.time,
+                "amount": double.tryParse(log?.text ?? '') ?? 0.0,
+              },
+            )
+            .toList()
+            .reversed
+            .take(5)
+            .toList();
+      });
+    });
   }
 
   List<Map<String, dynamic>> recentTransactions = [
-    {"title": "Star Café", "category": "Shopping", "amount": 87.66},
-    {"title": "Fuel Station", "category": "Shopping", "amount": 101.05},
-    {"title": "Bakery", "category": "Transport", "amount": 63.31},
+    // {"title": "Star Café", "category": "Shopping", "amount": 87.66},
+    // {"title": "Fuel Station", "category": "Shopping", "amount": 101.05},
+    // {"title": "Bakery", "category": "Transport", "amount": 63.31},
   ];
 
   @override
@@ -158,14 +179,14 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 22),
-            /*
+
             // Recent transactions
             const Text(
               "Recent Transactions",
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-               Column(
+            Column(
               children: recentTransactions.map((t) {
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -184,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               }).toList(),
-            ),*/
+            ),
             // MessagePage(),
             const SizedBox(height: 20),
 

@@ -135,9 +135,10 @@ class _ShoppingPageState extends State<ShoppingPage> {
   void initState() {
     super.initState();
     ShoppingItems.items.then((loadedItems) {
-      setState(() {
-        items = loadedItems;
-      });
+      if (mounted)
+        setState(() {
+          items = loadedItems;
+        });
     });
   }
 
