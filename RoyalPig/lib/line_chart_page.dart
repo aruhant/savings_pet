@@ -16,7 +16,9 @@ class _LineChartStatsState extends State<LineChartStats> {
   @override
   void initState() {
     super.initState();
+  }
 
+  setup() {
     final listener = DynamoStreamListener<SocialStats>(
       tableName: "stats",
       fromJson: (json) => SocialStats.fromJson(json),
